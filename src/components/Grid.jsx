@@ -14,7 +14,11 @@ function gridReducer(draft, action) {
   const col = draft.selectedCell?.col;
   switch (action.type) {
     case "deleted":
-      draft.contents[row][col].value = "";
+      if (draft.contents[row][col] === ".") {
+        draft.contents[rowCount - 1 - row][colCount - 1 - col] = "";
+      }
+      draft.contents[row][col] = "";
+
       draft.selectedCell = calcNextCell(
         draft.selectedCell,
         rowCount,
@@ -24,7 +28,7 @@ function gridReducer(draft, action) {
       );
       break;
     case "inserted":
-      draft.contents[row][col].value = action.value;
+      draft.contents[row][col] = action.value;
       draft.selectedCell = calcNextCell(
         draft.selectedCell,
         rowCount,
@@ -48,6 +52,18 @@ function gridReducer(draft, action) {
         action.direction === "right" || action.direction === "down"
           ? "forward"
           : "backward"
+      );
+      break;
+    case "insertedBox":
+      draft.contents[row][col] = ".";
+      draft.contents[rowCount - 1 - row][colCount - 1 - col] = ".";
+
+      draft.selectedCell = calcNextCell(
+        draft.selectedCell,
+        rowCount,
+        colCount,
+        draft.isHorizontal,
+        "forward"
       );
   }
 }
@@ -93,7 +109,6 @@ export function Grid({ numRows, numCols }) {
     selectedCell: null,
     isHorizontal: true,
   };
-
   const [grid, dispatch] = useImmerReducer(gridReducer, initialGrid);
 
   useEffect(() => {
@@ -139,6 +154,9 @@ export function Grid({ numRows, numCols }) {
             dispatch({ type: "toggledDirection", value: false });
           }
           break;
+        case key === ".":
+          dispatch({ type: "insertedBox" });
+          break;
         default:
           break;
       }
@@ -151,9 +169,40 @@ export function Grid({ numRows, numCols }) {
   function createGrid(numRows, numCols) {
     return Array.from({ length: numRows }, () =>
       Array.from({ length: numCols }, () => {
-        return { value: "", isBlack: false };
+        return "";
       })
     );
+  }
+
+  const highlightedCells = new Set();
+
+  if (grid.selectedCell) {
+    const { row: selRow, col: selCol } = grid.selectedCell;
+
+    if (grid.isHorizontal) {
+      for (let c = selCol; c >= 0 && grid.contents[selRow][c] !== "."; c--) {
+        highlightedCells.add(`${selRow}-${c}`);
+      }
+      for (
+        let c = selCol + 1;
+        c < numCols && grid.contents[selRow][c] !== ".";
+        c++
+      ) {
+        highlightedCells.add(`${selRow}-${c}`);
+      }
+    }
+    if (!grid.isHorizontal) {
+      for (let r = selRow; r >= 0 && grid.contents[r][selCol] !== "."; r--) {
+        highlightedCells.add(`${r}-${selCol}`);
+      }
+      for (
+        let r = selRow + 1;
+        r < numRows && grid.contents[r][selCol] !== ".";
+        r++
+      ) {
+        highlightedCells.add(`${r}-${selCol}`);
+      }
+    }
   }
 
   return (
@@ -169,16 +218,15 @@ export function Grid({ numRows, numCols }) {
             <Cell
               key={`${r}-${c}`}
               size={CELL_SIZE_REM}
-              value={cell.value}
-              isBlack={false}
+              value={cell}
+              isReciprocal={
+                numRows - 1 - grid.selectedCell?.row === r &&
+                numCols - 1 - grid.selectedCell?.col === c
+              }
               isSelected={
                 grid.selectedCell?.row === r && grid.selectedCell?.col === c
               }
-              isHighlighted={
-                grid.isHorizontal
-                  ? grid.selectedCell?.row === r
-                  : grid.selectedCell?.col === c
-              }
+              isHighlighted={highlightedCells.has(`${r}-${c}`)}
               isRightEdge={c === numCols - 1}
               isBottomEdge={r === numRows - 1}
               handleClick={() => {
