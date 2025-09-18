@@ -2,6 +2,7 @@ import { clsx } from "clsx";
 
 export function Cell({
   value,
+  number,
   cellSizeRem,
   isHighlighted,
   isReciprocal,
@@ -15,7 +16,7 @@ export function Cell({
     <>
       <div
         className={clsx(
-          "flex justify-center items-center border-l-[0.5px] border-t-[0.5px] border-black",
+          "relative flex justify-center items-end text-3xl border-l-[0.5px] border-t-[0.5px] border-black",
           {
             "border-r-[0.5px]": isRightEdge,
             "border-b-[0.5px]": isBottomEdge,
@@ -48,6 +49,9 @@ export function Cell({
         }}
         onClick={handleClick}
       >
+        <div className="absolute top-0 left-0 text-[0.55rem] m-[0.1rem]">
+          {number !== 0 && number}
+        </div>
         {!isBlack && value}
       </div>
     </>

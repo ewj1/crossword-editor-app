@@ -8,16 +8,16 @@ function gridReducer(draft, action) {
   if (!draft.selectedCell && action.type !== "selected") {
     return;
   }
-  const rowCount = draft.contents.length;
-  const colCount = draft.contents[0].length;
+  const rowCount = draft.grid.length;
+  const colCount = draft.grid[0].length;
   const row = draft.selectedCell?.row;
   const col = draft.selectedCell?.col;
   switch (action.type) {
     case "deleted":
-      if (draft.contents[row][col] === ".") {
-        draft.contents[rowCount - 1 - row][colCount - 1 - col] = "";
+      if (draft.grid[row][col] === ".") {
+        draft.grid[rowCount - 1 - row][colCount - 1 - col] = "";
       }
-      draft.contents[row][col] = "";
+      draft.grid[row][col] = "";
 
       draft.selectedCell = calcNextCell(
         draft.selectedCell,
@@ -28,7 +28,7 @@ function gridReducer(draft, action) {
       );
       break;
     case "inserted":
-      draft.contents[row][col] = action.value;
+      draft.grid[row][col] = action.value;
       draft.selectedCell = calcNextCell(
         draft.selectedCell,
         rowCount,
@@ -55,8 +55,8 @@ function gridReducer(draft, action) {
       );
       break;
     case "insertedBox":
-      draft.contents[row][col] = ".";
-      draft.contents[rowCount - 1 - row][colCount - 1 - col] = ".";
+      draft.grid[row][col] = ".";
+      draft.grid[rowCount - 1 - row][colCount - 1 - col] = ".";
 
       draft.selectedCell = calcNextCell(
         draft.selectedCell,
@@ -104,16 +104,16 @@ function calcNextCell(
 }
 
 export function Grid({ numRows, numCols }) {
-  const initialGrid = {
-    contents: createGrid(numRows, numCols),
+  const initialState = {
+    grid: createGrid(numRows, numCols),
     selectedCell: null,
     isHorizontal: true,
   };
-  const [grid, dispatch] = useImmerReducer(gridReducer, initialGrid);
+  const [state, dispatch] = useImmerReducer(gridReducer, initialState);
 
   useEffect(() => {
     function handleKeyDown(e) {
-      if (!grid.selectedCell) return;
+      if (!state.selectedCell) return;
       const key = e.key.toUpperCase();
 
       switch (true) {
@@ -124,31 +124,31 @@ export function Grid({ numRows, numCols }) {
           dispatch({ type: "deleted" });
           break;
         case key === " ":
-          dispatch({ type: "toggledDirection", value: !grid.isHorizontal });
+          dispatch({ type: "toggledDirection", value: !state.isHorizontal });
           break;
         case key === "ARROWRIGHT":
-          if (grid.isHorizontal) {
+          if (state.isHorizontal) {
             dispatch({ type: "moved", direction: "right" });
           } else {
             dispatch({ type: "toggledDirection", value: true });
           }
           break;
         case key === "ARROWLEFT":
-          if (grid.isHorizontal) {
+          if (state.isHorizontal) {
             dispatch({ type: "moved", direction: "left" });
           } else {
             dispatch({ type: "toggledDirection", value: true });
           }
           break;
         case key === "ARROWUP":
-          if (!grid.isHorizontal) {
+          if (!state.isHorizontal) {
             dispatch({ type: "moved", direction: "up" });
           } else {
             dispatch({ type: "toggledDirection", value: false });
           }
           break;
         case key === "ARROWDOWN":
-          if (!grid.isHorizontal) {
+          if (!state.isHorizontal) {
             dispatch({ type: "moved", direction: "down" });
           } else {
             dispatch({ type: "toggledDirection", value: false });
@@ -164,7 +164,7 @@ export function Grid({ numRows, numCols }) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [grid.isHorizontal, grid.selectedCell, dispatch]);
+  }, [state.isHorizontal, state.selectedCell, dispatch]);
 
   function createGrid(numRows, numCols) {
     return Array.from({ length: numRows }, () =>
@@ -173,38 +173,60 @@ export function Grid({ numRows, numCols }) {
       })
     );
   }
-
+  //DETERMINE HIGHLIGHTED CELLS
   const highlightedCells = new Set();
+  if (state.selectedCell) {
+    const { row: selRow, col: selCol } = state.selectedCell;
 
-  if (grid.selectedCell) {
-    const { row: selRow, col: selCol } = grid.selectedCell;
-
-    if (grid.isHorizontal) {
-      for (let c = selCol; c >= 0 && grid.contents[selRow][c] !== "."; c--) {
+    if (state.isHorizontal) {
+      for (let c = selCol; c >= 0 && state.grid[selRow][c] !== "."; c--) {
         highlightedCells.add(`${selRow}-${c}`);
       }
       for (
         let c = selCol + 1;
-        c < numCols && grid.contents[selRow][c] !== ".";
+        c < numCols && state.grid[selRow][c] !== ".";
         c++
       ) {
         highlightedCells.add(`${selRow}-${c}`);
       }
     }
-    if (!grid.isHorizontal) {
-      for (let r = selRow; r >= 0 && grid.contents[r][selCol] !== "."; r--) {
+    if (!state.isHorizontal) {
+      for (let r = selRow; r >= 0 && state.grid[r][selCol] !== "."; r--) {
         highlightedCells.add(`${r}-${selCol}`);
       }
       for (
         let r = selRow + 1;
-        r < numRows && grid.contents[r][selCol] !== ".";
+        r < numRows && state.grid[r][selCol] !== ".";
         r++
       ) {
         highlightedCells.add(`${r}-${selCol}`);
       }
     }
   }
+  let number = 0;
+  //DETERMINE CELL NUMBERING
+  function calcNumber(r, c) {
+    const cell = state.grid[r][c];
+    if (cell === ".") return 0;
 
+    // Check if this cell can start an across word
+    const isStartAcross =
+      (c === 0 || state.grid[r][c - 1] === ".") &&
+      c + 1 < numCols &&
+      state.grid[r][c + 1] !== ".";
+
+    // Check if this cell can start a down word
+    const isStartDown =
+      (r === 0 || state.grid[r - 1][c] === ".") &&
+      r + 1 < numRows &&
+      state.grid[r + 1][c] !== ".";
+
+    if (isStartAcross || isStartDown) {
+      return ++number;
+    }
+
+    return 0;
+  }
   return (
     <>
       <div
@@ -213,30 +235,31 @@ export function Grid({ numRows, numCols }) {
           gridTemplateColumns: `repeat(${numCols}, ${CELL_SIZE_REM}rem)`,
         }}
       >
-        {grid.contents.map((row, r) =>
+        {state.grid.map((row, r) =>
           row.map((cell, c) => (
             <Cell
               key={`${r}-${c}`}
               cellSizeRem={CELL_SIZE_REM}
               value={cell}
+              number={calcNumber(r, c)}
               isReciprocal={
-                numRows - 1 - grid.selectedCell?.row === r &&
-                numCols - 1 - grid.selectedCell?.col === c
+                numRows - 1 - state.selectedCell?.row === r &&
+                numCols - 1 - state.selectedCell?.col === c
               }
               isSelected={
-                grid.selectedCell?.row === r && grid.selectedCell?.col === c
+                state.selectedCell?.row === r && state.selectedCell?.col === c
               }
               isHighlighted={highlightedCells.has(`${r}-${c}`)}
               isRightEdge={c === numCols - 1}
               isBottomEdge={r === numRows - 1}
               handleClick={() => {
                 if (
-                  grid.selectedCell?.row === r &&
-                  grid.selectedCell?.col === c
+                  state.selectedCell?.row === r &&
+                  state.selectedCell?.col === c
                 ) {
                   dispatch({
                     type: "toggledDirection",
-                    value: !grid.isHorizontal,
+                    value: !state.isHorizontal,
                   });
                 } else {
                   dispatch({ type: "selected", row: r, col: c });
