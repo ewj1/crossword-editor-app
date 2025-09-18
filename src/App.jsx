@@ -4,7 +4,7 @@ export default function App() {
   return (
     <>
       <div className="flex justify-center">
-        <Grid numRows={20} numCols={20}></Grid>
+        <Grid numRows={15} numCols={15}></Grid>
       </div>
     </>
   );
