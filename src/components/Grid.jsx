@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useImmerReducer } from "use-immer";
 import { Cell } from "./Cell";
 
-const CELL_SIZE_REM = 1.25;
+const CELL_SIZE_REM = 2.5;
 
 function gridReducer(draft, action) {
   if (!draft.selectedCell && action.type !== "selected") {
@@ -217,7 +217,7 @@ export function Grid({ numRows, numCols }) {
           row.map((cell, c) => (
             <Cell
               key={`${r}-${c}`}
-              size={CELL_SIZE_REM}
+              cellSizeRem={CELL_SIZE_REM}
               value={cell}
               isReciprocal={
                 numRows - 1 - grid.selectedCell?.row === r &&

@@ -2,7 +2,7 @@ import { clsx } from "clsx";
 
 export function Cell({
   value,
-  size,
+  cellSizeRem,
   isHighlighted,
   isReciprocal,
   isSelected,
@@ -17,20 +17,35 @@ export function Cell({
         className={clsx(
           "flex justify-center items-center border-l-[0.5px] border-t-[0.5px] border-black",
           {
-            "bg-orange-400": isSelected && !isBlack, // selected always wins
-            "bg-orange-100": isHighlighted && !isSelected && !isBlack,
-            "bg-black": isBlack && !isSelected,
-            "bg-[repeating-linear-gradient(135deg,#000,#000_10px,#FFA500_10px,#FFA500_20px)]":
-              isBlack && isSelected,
-            "bg-[repeating-linear-gradient(45deg,#fff,#fff_20px,#FFA500_20px,#FFA500_30px)]":
-              isReciprocal && !isBlack,
-            "bg-[repeating-linear-gradient(45deg,#000,#000_20px,#FFA500_20px,#FFA500_30px)]":
-              isReciprocal && isBlack,
             "border-r-[0.5px]": isRightEdge,
             "border-b-[0.5px]": isBottomEdge,
           }
         )}
-        style={{ width: `${size}rem`, height: `${size}rem` }}
+        style={{
+          width: `${cellSizeRem}rem`,
+          height: `${cellSizeRem}rem`,
+          backgroundColor: [
+            // base
+            isBlack
+              ? "#000"
+              : isSelected
+              ? "var(--color-orange-400)"
+              : isHighlighted
+              ? "var(--color-orange-100)"
+              : "#fff",
+          ],
+          backgroundImage: [
+            isBlack && isSelected
+              ? `repeating-linear-gradient(135deg,#000,#000 ${
+                  cellSizeRem / 4
+                }rem,var(--color-orange-400) ${
+                  cellSizeRem / 4
+                }rem,var(--color-orange-400) ${cellSizeRem / 2}rem)`
+              : isReciprocal
+              ? `linear-gradient(45deg,transparent 80%,var(--color-orange-400) 20%)`
+              : "none",
+          ],
+        }}
         onClick={handleClick}
       >
         {!isBlack && value}
