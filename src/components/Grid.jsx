@@ -174,35 +174,41 @@ export function Grid({ numRows, numCols }) {
     );
   }
   //DETERMINE HIGHLIGHTED CELLS
-  const highlightedCells = new Set();
-  if (state.selectedCell) {
+
+  function findOrderedHighlightedCells() {
+    const orderedHighlightedCells = [];
+    if (!state.selectedCell) return;
     const { row: selRow, col: selCol } = state.selectedCell;
+    if (state.grid[selRow][selCol] === ".") return;
 
     if (state.isHorizontal) {
       for (let c = selCol; c >= 0 && state.grid[selRow][c] !== "."; c--) {
-        highlightedCells.add(`${selRow}-${c}`);
+        orderedHighlightedCells.unshift(`${selRow}-${c}`);
       }
       for (
         let c = selCol + 1;
         c < numCols && state.grid[selRow][c] !== ".";
         c++
       ) {
-        highlightedCells.add(`${selRow}-${c}`);
+        orderedHighlightedCells.push(`${selRow}-${c}`);
       }
     }
     if (!state.isHorizontal) {
       for (let r = selRow; r >= 0 && state.grid[r][selCol] !== "."; r--) {
-        highlightedCells.add(`${r}-${selCol}`);
+        orderedHighlightedCells.unshift(`${r}-${selCol}`);
       }
       for (
         let r = selRow + 1;
         r < numRows && state.grid[r][selCol] !== ".";
         r++
       ) {
-        highlightedCells.add(`${r}-${selCol}`);
+        orderedHighlightedCells.push(`${r}-${selCol}`);
       }
     }
+    return orderedHighlightedCells;
   }
+  const highlightedCells = new Set(findOrderedHighlightedCells());
+
   let number = 0;
   //DETERMINE CELL NUMBERING
   function calcNumber(r, c) {
