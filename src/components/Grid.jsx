@@ -6,7 +6,7 @@ import { WordSuggestions } from "./WordSuggestions";
 const CELL_SIZE_REM = 2.5;
 
 function gridReducer(draft, action) {
-  if (!draft.selectedCell && action.type !== "selected") {
+  if (!draft.selectedCell && action.type !== "selectedCell") {
     return;
   }
   const rowCount = draft.grid.length;
@@ -28,7 +28,7 @@ function gridReducer(draft, action) {
         "backward"
       );
       break;
-    case "inserted":
+    case "insertedLetter":
       draft.grid[row][col] = action.value;
       draft.selectedCell = calcNextCell(
         draft.selectedCell,
@@ -38,7 +38,7 @@ function gridReducer(draft, action) {
         "forward"
       );
       break;
-    case "selected":
+    case "selectedCell":
       draft.selectedCell = { row: action.row, col: action.col };
       break;
     case "toggledDirection":
@@ -66,6 +66,19 @@ function gridReducer(draft, action) {
         draft.isHorizontal,
         "forward"
       );
+      break;
+    case "selectedSuggestion":
+      {
+        findOrderedHighlightedCells(draft)
+          .map((cell) => cell.split("-"))
+          .forEach(([row, col], i) => {
+            draft.grid[row][col] = action.value[i];
+          });
+      }
+      break;
+    default:
+      console.error("invalid dispatch action");
+      break;
   }
 }
 
@@ -104,9 +117,50 @@ function calcNextCell(
   return { row: newRow, col: newCol };
 }
 
-export function Grid({ numRows, numCols }) {
+function createGrid(size) {
+  return Array.from({ length: size }, () =>
+    Array.from({ length: size }, () => {
+      return "";
+    })
+  );
+}
+
+function findOrderedHighlightedCells(state) {
+  const orderedHighlightedCells = [];
+  if (!state.selectedCell) return;
+  const { row: selRow, col: selCol } = state.selectedCell;
+  if (state.grid[selRow][selCol] === ".") return;
+
+  if (state.isHorizontal) {
+    for (let c = selCol; c >= 0 && state.grid[selRow][c] !== "."; c--) {
+      orderedHighlightedCells.unshift(`${selRow}-${c}`);
+    }
+    for (
+      let c = selCol + 1;
+      c < state.grid.length && state.grid[selRow][c] !== ".";
+      c++
+    ) {
+      orderedHighlightedCells.push(`${selRow}-${c}`);
+    }
+  }
+  if (!state.isHorizontal) {
+    for (let r = selRow; r >= 0 && state.grid[r][selCol] !== "."; r--) {
+      orderedHighlightedCells.unshift(`${r}-${selCol}`);
+    }
+    for (
+      let r = selRow + 1;
+      r < state.grid.length && state.grid[r][selCol] !== ".";
+      r++
+    ) {
+      orderedHighlightedCells.push(`${r}-${selCol}`);
+    }
+  }
+  return orderedHighlightedCells;
+}
+
+export function Grid({ size }) {
   const initialState = {
-    grid: createGrid(numRows, numCols),
+    grid: createGrid(size),
     selectedCell: null,
     isHorizontal: true,
   };
@@ -119,7 +173,7 @@ export function Grid({ numRows, numCols }) {
 
       switch (true) {
         case /^[A-Z]$/.test(key):
-          dispatch({ type: "inserted", value: key });
+          dispatch({ type: "insertedLetter", value: key });
           break;
         case key === "BACKSPACE":
           dispatch({ type: "deleted" });
@@ -167,49 +221,10 @@ export function Grid({ numRows, numCols }) {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [state.isHorizontal, state.selectedCell, dispatch]);
 
-  function createGrid(numRows, numCols) {
-    return Array.from({ length: numRows }, () =>
-      Array.from({ length: numCols }, () => {
-        return "";
-      })
-    );
-  }
   //DETERMINE HIGHLIGHTED CELLS
 
-  function findOrderedHighlightedCells() {
-    const orderedHighlightedCells = [];
-    if (!state.selectedCell) return;
-    const { row: selRow, col: selCol } = state.selectedCell;
-    if (state.grid[selRow][selCol] === ".") return;
-
-    if (state.isHorizontal) {
-      for (let c = selCol; c >= 0 && state.grid[selRow][c] !== "."; c--) {
-        orderedHighlightedCells.unshift(`${selRow}-${c}`);
-      }
-      for (
-        let c = selCol + 1;
-        c < numCols && state.grid[selRow][c] !== ".";
-        c++
-      ) {
-        orderedHighlightedCells.push(`${selRow}-${c}`);
-      }
-    }
-    if (!state.isHorizontal) {
-      for (let r = selRow; r >= 0 && state.grid[r][selCol] !== "."; r--) {
-        orderedHighlightedCells.unshift(`${r}-${selCol}`);
-      }
-      for (
-        let r = selRow + 1;
-        r < numRows && state.grid[r][selCol] !== ".";
-        r++
-      ) {
-        orderedHighlightedCells.push(`${r}-${selCol}`);
-      }
-    }
-    return orderedHighlightedCells;
-  }
-  const highlightedCells = new Set(findOrderedHighlightedCells());
-
+  const highlightedCells = new Set(findOrderedHighlightedCells(state));
+  console.log("highlightedCells", highlightedCells);
   let number = 0;
   //DETERMINE CELL NUMBERING
   function calcNumber(r, c) {
@@ -219,13 +234,13 @@ export function Grid({ numRows, numCols }) {
     // Check if this cell can start an across word
     const isStartAcross =
       (c === 0 || state.grid[r][c - 1] === ".") &&
-      c + 1 < numCols &&
+      c + 1 < size &&
       state.grid[r][c + 1] !== ".";
 
     // Check if this cell can start a down word
     const isStartDown =
       (r === 0 || state.grid[r - 1][c] === ".") &&
-      r + 1 < numRows &&
+      r + 1 < size &&
       state.grid[r + 1][c] !== ".";
 
     if (isStartAcross || isStartDown) {
@@ -239,7 +254,7 @@ export function Grid({ numRows, numCols }) {
       <div
         className="grid gap-0"
         style={{
-          gridTemplateColumns: `repeat(${numCols}, ${CELL_SIZE_REM}rem)`,
+          gridTemplateColumns: `repeat(${size}, ${CELL_SIZE_REM}rem)`,
         }}
       >
         {state.grid.map((row, r) =>
@@ -250,15 +265,15 @@ export function Grid({ numRows, numCols }) {
               value={cell}
               number={calcNumber(r, c)}
               isReciprocal={
-                numRows - 1 - state.selectedCell?.row === r &&
-                numCols - 1 - state.selectedCell?.col === c
+                size - 1 - state.selectedCell?.row === r &&
+                size - 1 - state.selectedCell?.col === c
               }
               isSelected={
                 state.selectedCell?.row === r && state.selectedCell?.col === c
               }
               isHighlighted={highlightedCells.has(`${r}-${c}`)}
-              isRightEdge={c === numCols - 1}
-              isBottomEdge={r === numRows - 1}
+              isRightEdge={c === size - 1}
+              isBottomEdge={r === size - 1}
               handleClick={() => {
                 if (
                   state.selectedCell?.row === r &&
@@ -269,7 +284,7 @@ export function Grid({ numRows, numCols }) {
                     value: !state.isHorizontal,
                   });
                 } else {
-                  dispatch({ type: "selected", row: r, col: c });
+                  dispatch({ type: "selectedCell", row: r, col: c });
                 }
               }}
             />
@@ -279,10 +294,11 @@ export function Grid({ numRows, numCols }) {
       <div className="w-28">
         <WordSuggestions
           pattern={Array.from(highlightedCells)
-            .map((s) => s.split("-"))
-            .map(([r, c]) => state.grid[Number(r)][Number(c)])
+            .map((cell) => cell.split("-"))
+            .map(([row, col]) => state.grid[row][col])
             .map((val) => (val === "" ? "?" : val))
             .join("")}
+          dispatch={dispatch}
         />
       </div>
     </>

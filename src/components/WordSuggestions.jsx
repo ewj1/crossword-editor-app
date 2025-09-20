@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 
-export function WordSuggestions({ pattern }) {
+export function WordSuggestions({ pattern, dispatch }) {
   console.log(pattern, "pattern");
   const debouncedPattern = useDebounce(pattern, 400);
   const [suggestions, setSuggestions] = useState([]);
@@ -45,7 +45,17 @@ export function WordSuggestions({ pattern }) {
         {suggestions
           .filter((s) => toAlphanumeric(s.word).length === pattern.length)
           .map((s) => (
-            <li key={s.word}>{s.word}</li>
+            <li
+              key={s.word}
+              onClick={() =>
+                dispatch({
+                  type: "selectedSuggestion",
+                  value: toAlphanumeric(s.word).toUpperCase(),
+                })
+              }
+            >
+              {s.word}
+            </li>
           ))}
       </ul>
     </>
