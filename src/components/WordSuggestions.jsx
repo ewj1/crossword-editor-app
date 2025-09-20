@@ -17,7 +17,7 @@ export function WordSuggestions({ pattern }) {
       try {
         const url = `https://api.datamuse.com/words?sp=${encodeURIComponent(
           debouncedPattern
-        )}&max=10`;
+        )}&max=20`;
         const res = await fetch(url);
         const data = await res.json();
         console.log(data, "data");
@@ -35,12 +35,18 @@ export function WordSuggestions({ pattern }) {
     };
   }, [debouncedPattern]);
 
+  function toAlphanumeric(word) {
+    return word.replace(/[^a-z0-9]/gi, "");
+  }
+
   return (
     <>
       <ul>
-        {suggestions.map((s) => (
-          <li key={s.word}>{s.word}</li>
-        ))}
+        {suggestions
+          .filter((s) => toAlphanumeric(s.word).length === pattern.length)
+          .map((s) => (
+            <li key={s.word}>{s.word}</li>
+          ))}
       </ul>
     </>
   );
