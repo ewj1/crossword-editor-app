@@ -276,13 +276,15 @@ export function Grid({ numRows, numCols }) {
           ))
         )}
       </div>
-      <WordSuggestions
-        pattern={Array.from(highlightedCells)
-          .map((s) => s.split("-"))
-          .map(([r, c]) => state.grid[Number(r)][Number(c)])
-          .map((val) => (val === "" ? "?" : val))
-          .join("")}
-      />
+      <div className="w-28">
+        <WordSuggestions
+          pattern={Array.from(highlightedCells)
+            .map((s) => s.split("-"))
+            .map(([r, c]) => state.grid[Number(r)][Number(c)])
+            .map((val) => (val === "" ? "?" : val))
+            .join("")}
+        />
+      </div>
     </>
   );
 }
