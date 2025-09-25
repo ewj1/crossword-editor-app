@@ -41,23 +41,26 @@ export function WordSuggestions({ pattern, dispatch }) {
 
   return (
     <>
-      <ul>
-        {suggestions
-          .filter((s) => toAlphanumeric(s.word).length === pattern.length)
-          .map((s) => (
-            <li
-              key={s.word}
-              onClick={() =>
-                dispatch({
-                  type: "selectedSuggestion",
-                  value: toAlphanumeric(s.word).toUpperCase(),
-                })
-              }
-            >
-              {s.word}
-            </li>
-          ))}
-      </ul>
+      {suggestions.length > 0 && (
+        <ul className="w-full min-w-[20rem] border border-gray-300 rounded-md overflow-y-auto max-h-[20rem]">
+          {suggestions
+            .filter((s) => toAlphanumeric(s.word).length === pattern.length)
+            .map((s) => (
+              <li
+                key={s.word}
+                className="px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() =>
+                  dispatch({
+                    type: "selectedSuggestion",
+                    value: toAlphanumeric(s.word).toUpperCase(),
+                  })
+                }
+              >
+                {s.word}
+              </li>
+            ))}
+        </ul>
+      )}
     </>
   );
 }
