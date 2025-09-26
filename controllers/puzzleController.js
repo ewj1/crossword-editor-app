@@ -1,16 +1,14 @@
 import { createPuzzle, findPuzzlesByUser } from "../models/puzzleModel.js";
 
-export const savePuzzle = async (req, res) => {
-  if (!req.user) return res.status(401).json({ error: "Not logged in" });
+export async function savePuzzle(req, res) {
+  const userId = req.user.id;
+  const puzzleData = req.body;
+  const id = await createPuzzle(userId, puzzleData);
+  res.json({ message: "Puzzle saved", id });
+}
 
-  const { title, data } = req.body;
-  const puzzleId = await createPuzzle(req.user.id, title, data);
-  res.json({ success: true, puzzleId });
-};
-
-export const getPuzzles = async (req, res) => {
-  if (!req.user) return res.status(401).json({ error: "Not logged in" });
-
-  const puzzles = await findPuzzlesByUser(req.user.id);
+export async function getPuzzles(req, res) {
+  const userId = req.user.id;
+  const puzzles = await findPuzzlesByUser(userId);
   res.json(puzzles);
-};
+}

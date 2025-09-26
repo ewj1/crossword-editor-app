@@ -1,6 +1,9 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { db } from "./db.js";
+import {
+  findOrCreateUser,
+  getUserById,
+} from "../controllers/authController.js";
 
 passport.use(
   new GoogleStrategy(
@@ -10,22 +13,7 @@ passport.use(
       callbackURL: "http://localhost:3000/auth/google/callback",
     },
     async (accessToken, refreshToken, profile, done) => {
-      const [rows] = await db.query("SELECT * FROM users WHERE google_id = ?", [
-        profile.id,
-      ]);
-      let user = rows[0];
-      if (!user) {
-        const [result] = await db.query(
-          "INSERT INTO users (google_id, name, email) VALUES (?, ?, ?)",
-          [profile.id, profile.displayName, profile.emails[0].value]
-        );
-        user = {
-          id: result.insertId,
-          google_id: profile.id,
-          name: profile.displayName,
-          email: profile.emails[0].value,
-        };
-      }
+      const user = await findOrCreateUser(profile);
       done(null, user);
     }
   )
@@ -33,6 +21,6 @@ passport.use(
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
-  const [rows] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
-  done(null, rows[0]);
+  const user = await getUserById(id);
+  done(null, user);
 });
