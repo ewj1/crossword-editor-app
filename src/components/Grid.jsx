@@ -224,7 +224,6 @@ export function Grid({ size }) {
   //DETERMINE HIGHLIGHTED CELLS
 
   const highlightedCells = new Set(findOrderedHighlightedCells(state));
-  console.log("highlightedCells", highlightedCells);
   let number = 0;
   //DETERMINE CELL NUMBERING
   function calcNumber(r, c) {
@@ -251,47 +250,47 @@ export function Grid({ size }) {
   }
   return (
     <>
-      <div
-        className="grid gap-0"
-        style={{
-          gridTemplateColumns: `repeat(${size}, ${CELL_SIZE_REM}rem)`,
-        }}
-      >
-        {state.grid.map((row, r) =>
-          row.map((cell, c) => (
-            <Cell
-              key={`${r}-${c}`}
-              cellSizeRem={CELL_SIZE_REM}
-              value={cell}
-              number={calcNumber(r, c)}
-              isReciprocal={
-                size - 1 - state.selectedCell?.row === r &&
-                size - 1 - state.selectedCell?.col === c
-              }
-              isSelected={
-                state.selectedCell?.row === r && state.selectedCell?.col === c
-              }
-              isHighlighted={highlightedCells.has(`${r}-${c}`)}
-              isRightEdge={c === size - 1}
-              isBottomEdge={r === size - 1}
-              handleClick={() => {
-                if (
-                  state.selectedCell?.row === r &&
-                  state.selectedCell?.col === c
-                ) {
-                  dispatch({
-                    type: "toggledDirection",
-                    value: !state.isHorizontal,
-                  });
-                } else {
-                  dispatch({ type: "selectedCell", row: r, col: c });
+      <div className="flex gap-4">
+        <div
+          className="grid gap-0"
+          style={{
+            gridTemplateColumns: `repeat(${size}, ${CELL_SIZE_REM}rem)`,
+          }}
+        >
+          {state.grid.map((row, r) =>
+            row.map((cell, c) => (
+              <Cell
+                key={`${r}-${c}`}
+                cellSizeRem={CELL_SIZE_REM}
+                value={cell}
+                number={calcNumber(r, c)}
+                isReciprocal={
+                  size - 1 - state.selectedCell?.row === r &&
+                  size - 1 - state.selectedCell?.col === c
                 }
-              }}
-            />
-          ))
-        )}
-      </div>
-      <div className="w-28">
+                isSelected={
+                  state.selectedCell?.row === r && state.selectedCell?.col === c
+                }
+                isHighlighted={highlightedCells.has(`${r}-${c}`)}
+                isRightEdge={c === size - 1}
+                isBottomEdge={r === size - 1}
+                handleClick={() => {
+                  if (
+                    state.selectedCell?.row === r &&
+                    state.selectedCell?.col === c
+                  ) {
+                    dispatch({
+                      type: "toggledDirection",
+                      value: !state.isHorizontal,
+                    });
+                  } else {
+                    dispatch({ type: "selectedCell", row: r, col: c });
+                  }
+                }}
+              />
+            ))
+          )}
+        </div>
         <WordSuggestions
           pattern={Array.from(highlightedCells)
             .map((cell) => cell.split("-"))
