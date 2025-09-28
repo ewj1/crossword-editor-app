@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useImmerReducer } from "use-immer";
 import { Cell } from "./Cell";
 import { WordSuggestions } from "./WordSuggestions";
@@ -25,7 +25,7 @@ function gridReducer(draft, action) {
         rowCount,
         colCount,
         draft.isHorizontal,
-        "backward"
+        "backward",
       );
       break;
     case "insertedLetter":
@@ -35,11 +35,14 @@ function gridReducer(draft, action) {
         rowCount,
         colCount,
         draft.isHorizontal,
-        "forward"
+        "forward",
       );
       break;
     case "selectedCell":
       draft.selectedCell = { row: action.row, col: action.col };
+      break;
+    case "clearedSelection":
+      draft.selectedCell = null;
       break;
     case "toggledDirection":
       draft.isHorizontal = action.value;
@@ -52,7 +55,7 @@ function gridReducer(draft, action) {
         draft.isHorizontal,
         action.direction === "right" || action.direction === "down"
           ? "forward"
-          : "backward"
+          : "backward",
       );
       break;
     case "insertedBox":
@@ -64,7 +67,7 @@ function gridReducer(draft, action) {
         rowCount,
         colCount,
         draft.isHorizontal,
-        "forward"
+        "forward",
       );
       break;
     case "selectedSuggestion":
@@ -89,7 +92,7 @@ function calcNextCell(
   rowCount,
   colCount,
   isHorizontal,
-  direction
+  direction,
 ) {
   let newRow = row;
   let newCol = col;
@@ -121,7 +124,7 @@ function createGrid(size) {
   return Array.from({ length: size }, () =>
     Array.from({ length: size }, () => {
       return "";
-    })
+    }),
   );
 }
 
@@ -165,6 +168,20 @@ export function Grid({ size }) {
     isHorizontal: true,
   };
   const [state, dispatch] = useImmerReducer(gridReducer, initialState);
+  const gridRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (gridRef.current && !gridRef.current.contains(event.target)) {
+        dispatch({ type: "clearedSelection" });
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dispatch]);
 
   useEffect(() => {
     function handleKeyDown(e) {
@@ -253,6 +270,7 @@ export function Grid({ size }) {
       <div className="flex gap-4">
         <div
           className="grid gap-0"
+          ref={gridRef}
           style={{
             gridTemplateColumns: `repeat(${size}, ${CELL_SIZE_REM}rem)`,
           }}
@@ -288,7 +306,7 @@ export function Grid({ size }) {
                   }
                 }}
               />
-            ))
+            )),
           )}
         </div>
         <WordSuggestions
