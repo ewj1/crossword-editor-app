@@ -196,6 +196,7 @@ export function Grid({ size }) {
           dispatch({ type: "deleted" });
           break;
         case key === " ":
+          e.preventDefault();
           dispatch({ type: "toggledDirection", value: !state.isHorizontal });
           break;
         case key === "ARROWRIGHT":
