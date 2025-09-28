@@ -23,5 +23,5 @@ export function AuthStatus({ user, setUser }) {
   }, [user, setUser]);
 
   if (!user) return <div>Not logged in</div>;
-  return <div>Logged in as {user}</div>;
+  return <span>Logged in as {user}</span>;
 }

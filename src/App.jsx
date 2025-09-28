@@ -17,12 +17,12 @@ export default function App() {
   return (
     <>
       <div className="flex justify-center gap-4">
-        <div className="flex flex-col">
+        <div className="flex flex-col select-none">
           <AuthStatus user={user} setUser={setUser} />
           <LoginButton />
           <LogoutButton onLogout={handleLogout} />
         </div>
-        <div className="flex flex-col">
+        <div>
           <Title
             title={title}
             setTitle={setTitle}
