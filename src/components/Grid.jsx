@@ -169,10 +169,14 @@ export function Grid({ size }) {
   };
   const [state, dispatch] = useImmerReducer(gridReducer, initialState);
   const gridRef = useRef(null);
+  const wordSuggestionsRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(event) {
-      if (gridRef.current && !gridRef.current.contains(event.target)) {
+      if (
+        !gridRef.current?.contains(event.target) &&
+        !wordSuggestionsRef.current?.contains(event.target)
+      ) {
         dispatch({ type: "clearedSelection" });
       }
     }
@@ -240,10 +244,10 @@ export function Grid({ size }) {
   }, [state.isHorizontal, state.selectedCell, dispatch]);
 
   //DETERMINE HIGHLIGHTED CELLS
-
   const highlightedCells = new Set(findOrderedHighlightedCells(state));
-  let number = 0;
+
   //DETERMINE CELL NUMBERING
+  let number = 0;
   function calcNumber(r, c) {
     const cell = state.grid[r][c];
     if (cell === ".") return 0;
@@ -311,6 +315,7 @@ export function Grid({ size }) {
           )}
         </div>
         <WordSuggestions
+          ref={wordSuggestionsRef}
           pattern={Array.from(highlightedCells)
             .map((cell) => cell.split("-"))
             .map(([row, col]) => state.grid[row][col])

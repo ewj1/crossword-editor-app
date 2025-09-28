@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useDebounce } from "../hooks/useDebounce";
 
-export function WordSuggestions({ pattern, dispatch }) {
+export function WordSuggestions({ ref, pattern, dispatch }) {
   const debouncedPattern = useDebounce(pattern, 400);
   const [suggestions, setSuggestions] = useState([]);
 
@@ -15,7 +15,7 @@ export function WordSuggestions({ pattern, dispatch }) {
     async function fetchSuggestions() {
       try {
         const url = `https://api.datamuse.com/words?sp=${encodeURIComponent(
-          debouncedPattern
+          debouncedPattern,
         )}&max=30`;
         const res = await fetch(url);
         const data = await res.json();
@@ -36,33 +36,36 @@ export function WordSuggestions({ pattern, dispatch }) {
   function toAlphanumeric(word) {
     return word.replace(/[^a-z0-9]/gi, "");
   }
-
+  const filteredSuggestions = suggestions.filter(
+    (s) => toAlphanumeric(s.word).length === pattern.length,
+  );
   return (
     <div>
       <h1>Word Suggestions</h1>
-      <ul className="w-full min-w-[20rem] border border-gray-300 rounded-md overflow-y-auto max-h-[20rem]">
-        {suggestions.length == 0
+      <ul
+        ref={ref}
+        className="max-h-[20rem] w-full min-w-[20rem] overflow-y-auto rounded-md border border-gray-300"
+      >
+        {pattern == "" || filteredSuggestions.length == 0
           ? Array.from({ length: 10 }).map((_, i) => (
-              <li key={i} className="px-4 py-2 border-b border-gray-200">
+              <li key={i} className="border-b border-gray-200 px-4 py-2">
                 &nbsp;
               </li>
             ))
-          : suggestions
-              .filter((s) => toAlphanumeric(s.word).length === pattern.length)
-              .map((s) => (
-                <li
-                  key={s.word}
-                  className="px-4 py-2 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
-                  onClick={() =>
-                    dispatch({
-                      type: "selectedSuggestion",
-                      value: toAlphanumeric(s.word).toUpperCase(),
-                    })
-                  }
-                >
-                  {s.word}
-                </li>
-              ))}
+          : filteredSuggestions.map((s) => (
+              <li
+                key={s.word}
+                className="cursor-pointer border-b border-gray-200 px-4 py-2 transition-colors hover:bg-gray-100"
+                onClick={() => {
+                  dispatch({
+                    type: "selectedSuggestion",
+                    value: toAlphanumeric(s.word).toUpperCase(),
+                  });
+                }}
+              >
+                {s.word}
+              </li>
+            ))}
       </ul>
     </div>
   );
