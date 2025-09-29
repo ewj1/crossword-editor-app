@@ -6,7 +6,7 @@ export function EditableSpan({ value, setValue, styleVariant = "" }) {
   useEditable(spanRef, setValue);
   return (
     <span
-      className={`border-b-2 border-white outline-none focus:border-blue-500 ${styleVariant}`}
+      className={`decoration-blue-500 underline-offset-6 outline-none focus:underline ${styleVariant}`}
       ref={spanRef}
     >
       {value}
