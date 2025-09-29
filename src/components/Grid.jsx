@@ -1,7 +1,8 @@
-import { useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useImmerReducer } from "use-immer";
 import { Cell } from "./Cell";
 import { WordSuggestions } from "./WordSuggestions";
+import { EntryLabel } from "./EntryLabel";
 
 const CELL_SIZE_REM = 2.5;
 
@@ -39,10 +40,11 @@ function gridReducer(draft, action) {
       );
       break;
     case "selectedCell":
+      draft.gridActive = true;
       draft.selectedCell = { row: action.row, col: action.col };
       break;
-    case "clearedSelection":
-      draft.selectedCell = null;
+    case "deactivateGrid":
+      draft.gridActive = false;
       break;
     case "toggledDirection":
       draft.isHorizontal = action.value;
@@ -164,10 +166,12 @@ function findOrderedHighlightedCells(state) {
 export function Grid({ size }) {
   const initialState = {
     grid: createGrid(size),
+    gridActive: false,
     selectedCell: null,
     isHorizontal: true,
   };
   const [state, dispatch] = useImmerReducer(gridReducer, initialState);
+  const [clues, setClues] = useState({});
   const gridRef = useRef(null);
   const wordSuggestionsRef = useRef(null);
 
@@ -177,7 +181,7 @@ export function Grid({ size }) {
         !gridRef.current?.contains(event.target) &&
         !wordSuggestionsRef.current?.contains(event.target)
       ) {
-        dispatch({ type: "clearedSelection" });
+        dispatch({ type: "deactivateGrid" });
       }
     }
 
@@ -189,7 +193,7 @@ export function Grid({ size }) {
 
   useEffect(() => {
     function handleKeyDown(e) {
-      if (!state.selectedCell) return;
+      if (!state.gridActive) return;
       const key = e.key.toUpperCase();
 
       switch (true) {
@@ -241,35 +245,55 @@ export function Grid({ size }) {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [state.isHorizontal, state.selectedCell, dispatch]);
+  }, [state.gridActive, state.isHorizontal, state.selectedCell, dispatch]);
 
-  //DETERMINE HIGHLIGHTED CELLS
-  const highlightedCells = new Set(findOrderedHighlightedCells(state));
-
-  //DETERMINE CELL NUMBERING
-  let number = 0;
-  function calcNumber(r, c) {
+  const numberMap = new Map();
+  let currentNum = 0;
+  for (const [r, row] of state.grid.entries()) {
+    for (const [c, _] of row.entries())
+      numberMap.set(`${r}-${c}`, calcNextNumber(r, c));
+  }
+  function calcNextNumber(r, c) {
     const cell = state.grid[r][c];
     if (cell === ".") return 0;
 
-    // Check if this cell can start an across word
     const isStartAcross =
       (c === 0 || state.grid[r][c - 1] === ".") &&
       c + 1 < size &&
       state.grid[r][c + 1] !== ".";
 
-    // Check if this cell can start a down word
     const isStartDown =
       (r === 0 || state.grid[r - 1][c] === ".") &&
       r + 1 < size &&
       state.grid[r + 1][c] !== ".";
 
     if (isStartAcross || isStartDown) {
-      return ++number;
+      return ++currentNum;
     }
 
     return 0;
   }
+
+  function makeKey(row, col, isHorizontal) {
+    return `${row}-${col}-${isHorizontal ? "across" : "down"}`;
+  }
+
+  function updateClue(row, col, isHorizontal, text) {
+    setClues((prev) => ({ ...prev, [makeKey(row, col, isHorizontal)]: text }));
+  }
+
+  function getClue(row, col, isHorizontal) {
+    const key = makeKey(row, col, isHorizontal);
+    if (!clues[key]) {
+      updateClue(row, col, isHorizontal, "(blank clue)");
+    }
+    return clues[key];
+  }
+
+  //DETERMINE HIGHLIGHTED CELLS
+  const highlightedCells = findOrderedHighlightedCells(state);
+  const highlightedCellsSet = new Set(highlightedCells);
+
   return (
     <>
       <div className="flex gap-4">
@@ -286,7 +310,7 @@ export function Grid({ size }) {
                 key={`${r}-${c}`}
                 cellSizeRem={CELL_SIZE_REM}
                 value={cell}
-                number={calcNumber(r, c)}
+                number={numberMap.get(`${r}-${c}`)}
                 isReciprocal={
                   size - 1 - state.selectedCell?.row === r &&
                   size - 1 - state.selectedCell?.col === c
@@ -294,11 +318,13 @@ export function Grid({ size }) {
                 isSelected={
                   state.selectedCell?.row === r && state.selectedCell?.col === c
                 }
-                isHighlighted={highlightedCells.has(`${r}-${c}`)}
+                isHighlighted={highlightedCellsSet.has(`${r}-${c}`)}
+                gridActive={state.gridActive}
                 isRightEdge={c === size - 1}
                 isBottomEdge={r === size - 1}
                 handleClick={() => {
                   if (
+                    state.gridActive &&
                     state.selectedCell?.row === r &&
                     state.selectedCell?.col === c
                   ) {
@@ -314,15 +340,34 @@ export function Grid({ size }) {
             )),
           )}
         </div>
-        <WordSuggestions
-          ref={wordSuggestionsRef}
-          pattern={Array.from(highlightedCells)
-            .map((cell) => cell.split("-"))
-            .map(([row, col]) => state.grid[row][col])
-            .map((val) => (val === "" ? "?" : val))
-            .join("")}
-          dispatch={dispatch}
-        />
+        <div>
+          <EntryLabel
+            selectedIndex={
+              highlightedCells && numberMap.get(highlightedCells[0])
+            }
+            isHorizontal={state.isHorizontal}
+            clue={
+              highlightedCells &&
+              getClue(...highlightedCells[0].split("-"), state.isHorizontal)
+            }
+            updateClue={(text) =>
+              updateClue(
+                ...highlightedCells[0].split("-"),
+                state.isHorizontal,
+                text,
+              )
+            }
+          />
+          <WordSuggestions
+            ref={wordSuggestionsRef}
+            pattern={highlightedCells
+              ?.map((cell) => cell.split("-"))
+              .map(([row, col]) => state.grid[row][col])
+              .map((val) => (val === "" ? "?" : val))
+              .join("")}
+            dispatch={dispatch}
+          />
+        </div>
       </div>
     </>
   );
