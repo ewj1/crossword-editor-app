@@ -1,9 +1,7 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import {
-  findOrCreateUser,
-  getUserById,
-} from "../controllers/authController.js";
+import { findOrCreateUser } from "../controllers/authController.js";
+import { findUserById } from "../models/userModel.js";
 
 passport.use(
   new GoogleStrategy(
@@ -11,16 +9,25 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "http://localhost:3000/auth/google/callback",
+      scope: ["profile", "email"],
     },
-    async (accessToken, refreshToken, profile, done) => {
-      const user = await findOrCreateUser(profile);
-      done(null, user);
+    async (accessToken, refreshToken, googleProfile, done) => {
+      try {
+        const user = await findOrCreateUser(googleProfile);
+        done(null, user);
+      } catch (err) {
+        done(err);
+      }
     }
   )
 );
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser(async (id, done) => {
-  const user = await getUserById(id);
-  done(null, user);
+  try {
+    const user = await findUserById(id);
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
 });

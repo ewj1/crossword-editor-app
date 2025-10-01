@@ -1,15 +1,10 @@
 import { findUserByGoogleId, createUser } from "../models/userModel.js";
 import { db } from "../config/db.js";
 
-export async function findOrCreateUser(profile) {
-  let user = await findUserByGoogleId(profile.id);
+export async function findOrCreateUser(googleProfile) {
+  let user = await findUserByGoogleId(googleProfile.id);
   if (!user) {
-    user = await createUser(profile);
+    user = await createUser(googleProfile);
   }
   return user;
-}
-
-export async function getUserById(id) {
-  const [rows] = await db.execute("SELECT * FROM users WHERE id = ?", [id]);
-  return rows[0];
 }
