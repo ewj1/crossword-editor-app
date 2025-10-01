@@ -1,6 +1,6 @@
 import { EditableSpan } from "./EditableSpan";
 
-export function Title({ title, setTitle, name, setName }) {
+export function Title({ title, setTitle, author, setAuthor }) {
   return (
     <>
       <div className="m-2 flex text-2xl text-gray-400">
@@ -10,7 +10,7 @@ export function Title({ title, setTitle, name, setName }) {
           styleVariant="text-black"
         ></EditableSpan>
         <span className="mx-[0.5rem]">by</span>
-        <EditableSpan value={name} setValue={setName}></EditableSpan>
+        <EditableSpan value={author} setValue={setAuthor}></EditableSpan>
       </div>
     </>
   );
