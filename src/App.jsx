@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 
+import { useAuth } from "./context/useAuth";
+
 import { Grid } from "./components/Grid";
 import { UserTab } from "./components/UserTab";
 import { Title } from "./components/Title";
-import { useAuth } from "./context/useAuth";
+import { Toolbar } from "./components/Toolbar";
 
 export function App() {
   const [title, setTitle] = useState("Untitled");
@@ -17,6 +19,7 @@ export function App() {
   return (
     <>
       <div className="m-4 flex justify-start gap-4">
+        <Toolbar />
         <div>
           <Title
             title={title}

@@ -55,7 +55,7 @@ export function WordSuggestions({ ref, pattern, dispatch }) {
           : filteredSuggestions.map((s) => (
               <li
                 key={s.word}
-                className="cursor-pointer px-4 text-gray-400 transition-colors hover:text-black"
+                className="cursor-pointer text-gray-400 transition-colors hover:text-black"
                 onClick={() => {
                   dispatch({
                     type: "selectedSuggestion",

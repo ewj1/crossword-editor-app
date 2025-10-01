@@ -340,7 +340,7 @@ export function Grid({ size }) {
             )),
           )}
         </div>
-        <div>
+        <div className="flex flex-col">
           <EntryLabel
             selectedIndex={
               highlightedCells && numberMap.get(highlightedCells[0])
