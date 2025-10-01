@@ -1,36 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Grid } from "./components/Grid";
-import { AuthStatus } from "./components/AuthStatus";
-import { LoginButton } from "./components/LoginButton";
-import { LogoutButton } from "./components/LogoutButton";
+import { UserTab } from "./components/UserTab";
 import { Title } from "./components/Title";
+import { useAuth } from "./context/useAuth";
 
-export default function App() {
+export function App() {
   const [title, setTitle] = useState("Untitled");
-  const [name, setName] = useState("Anonymous");
-  const [user, setUser] = useState(null);
+  const [author, setAuthor] = useState("Anonymous");
+  const { user } = useAuth();
 
-  function handleLogout() {
-    setUser(null);
-  }
+  useEffect(() => {
+    setAuthor(user?.name || "Anonymous");
+  }, [user]);
+
   return (
     <>
-      <div className="flex justify-center gap-4">
-        <div className="flex flex-col select-none">
-          <AuthStatus user={user} setUser={setUser} />
-          <LoginButton />
-          <LogoutButton onLogout={handleLogout} />
-        </div>
+      <div className="m-4 flex justify-start gap-4">
         <div>
           <Title
             title={title}
             setTitle={setTitle}
-            name={name}
-            setName={setName}
+            author={author}
+            setAuthor={setAuthor}
           ></Title>
           <Grid size={15}></Grid>
         </div>
+      </div>
+      <div className="absolute top-4 right-4 flex flex-col items-end space-y-2 select-none">
+        <UserTab />
       </div>
     </>
   );

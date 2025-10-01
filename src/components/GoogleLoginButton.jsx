@@ -1,14 +1,6 @@
 import "../assets/google.css";
 
-export function LoginButton() {
-  const handleLogin = async () => {
-    try {
-      window.location.href = "http://localhost:3000/auth/google";
-    } catch (err) {
-      console.error("Login failed", err);
-    }
-  };
-
+export function GoogleLoginButton({ handleLogin }) {
   return (
     <button className="gsi-material-button" onClick={handleLogin}>
       <div className="gsi-material-button-state"></div>
