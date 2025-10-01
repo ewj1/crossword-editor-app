@@ -1,18 +1,23 @@
 import { db } from "../config/db.js";
 
+export async function findUserById(id) {
+  const user = await db("users").where("id", id).first();
+  return user;
+}
+
 export async function findUserByGoogleId(googleId) {
-  const [rows] = await db.query("SELECT * FROM users WHERE google_id = ?", [
-    googleId,
-  ]);
-  return rows[0];
+  const rows = await db("users").where("google_id", googleId).first();
+  return rows;
 }
 
 export async function createUser(profile) {
-  const { id, displayName, emails } = profile;
-  const email = emails[0].value;
-  const [result] = await db.execute(
-    "INSERT INTO users (google_id, name, email) VALUES (?, ?, ?)",
-    [id, displayName, email]
-  );
-  return { id: result.insertId, google_id: id, name: displayName, email };
+  console.log("CREATED USER!!!!");
+  const { id: googleId, displayName, emails, photos } = profile;
+  await db("users").insert({
+    google_id: googleId,
+    name: displayName,
+    email: emails[0].value,
+    google_avatar: photos[0].value,
+  });
+  return findUserByGoogleId(googleId);
 }
