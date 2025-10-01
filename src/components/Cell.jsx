@@ -12,7 +12,6 @@ export function Cell({
   isBottomEdge,
   handleClick,
 }) {
-  console.log(isHighlighted);
   const isBlack = value === ".";
   const colorMap = {
     orange: {
