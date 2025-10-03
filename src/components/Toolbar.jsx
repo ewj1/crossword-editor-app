@@ -1,12 +1,12 @@
 import { SaveButton } from "./SaveButton";
 import { ExportButton } from "./ExportButton";
 
-export function Toolbar() {
+export function Toolbar({ onSave, onExport }) {
   return (
     <>
       <div className="flex flex-col">
-        <SaveButton />
-        <ExportButton />
+        <SaveButton onSave={onSave} />
+        <ExportButton onExport={onExport} />
       </div>
     </>
   );

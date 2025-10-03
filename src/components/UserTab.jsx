@@ -1,7 +1,7 @@
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "../auth/useAuth";
 import { GoogleLoginButton } from "./GoogleLoginButton";
 
-export function UserTab() {
+export function UserTab({ gridState }) {
   const { user, loading, login, logout } = useAuth();
 
   if (loading) {
@@ -20,6 +20,6 @@ export function UserTab() {
       <button onClick={logout}>Logout</button>
     </div>
   ) : (
-    <GoogleLoginButton handleLogin={login} />
+    <GoogleLoginButton handleLogin={() => login(gridState)} />
   );
 }

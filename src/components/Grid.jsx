@@ -1,11 +1,8 @@
-import { useEffect, useRef, useMemo, useImperativeHandle } from "react";
-import { useImmerReducer } from "use-immer";
-
-import { gridReducer } from "../reducers/gridReducer";
+import { useEffect, useRef, useMemo } from "react";
 import {
-  createGrid,
   findOrderedHighlightedCells,
   calculateNumberMap,
+  makeClueKey,
 } from "../utils/gridUtils";
 
 import { Cell } from "./Cell";
@@ -15,29 +12,10 @@ import { EntryLabel } from "./EntryLabel";
 const CELL_SIZE_REM = 2.5;
 
 //MAIN COMPONENT
-export function Grid({ size, ref }) {
-  const initialState = {
-    grid: createGrid(size),
-    gridActive: false,
-    selectedCell: null,
-    isHorizontal: true,
-    clues: {},
-  };
-
-  const [state, dispatch] = useImmerReducer(gridReducer, initialState);
+export function Grid({ state, dispatch }) {
+  const size = state.grid.length;
   const gridRef = useRef(null);
   const wordSuggestionsRef = useRef(null);
-
-  //EXPOSE SAVE DATA METHOD
-  useImperativeHandle(ref, () => ({
-    getSaveData() {
-      return {
-        grid: state.grid,
-        clues: state.clues,
-        size,
-      };
-    },
-  }));
 
   //MEMOIZED CALCULATIONS
   const highlightedCells = useMemo(
@@ -61,9 +39,6 @@ export function Grid({ size, ref }) {
   );
 
   //CLUE HELPERS
-  function makeClueKey(row, col, isHorizontal) {
-    return `${row}-${col}-${isHorizontal ? "across" : "down"}`;
-  }
 
   function updateClue(row, col, isHorizontal, text) {
     dispatch({
@@ -75,9 +50,6 @@ export function Grid({ size, ref }) {
 
   function getClue(row, col, isHorizontal) {
     const key = makeClueKey(row, col, isHorizontal);
-    if (!state.clues[key]) {
-      updateClue(row, col, isHorizontal, "(blank clue)");
-    }
     return state.clues[key];
   }
 

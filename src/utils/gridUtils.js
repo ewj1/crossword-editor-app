@@ -37,6 +37,21 @@ export function createGrid(size) {
   );
 }
 
+export function createClues(size) {
+  const clues = {};
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      clues[makeClueKey(r, c, true)] = "(blank clue)";
+      clues[makeClueKey(r, c, false)] = "(blank clue)";
+    }
+  }
+  return clues;
+}
+
+export function makeClueKey(row, col, isHorizontal) {
+  return `${row}-${col}-${isHorizontal ? "across" : "down"}`;
+}
+
 export function findOrderedHighlightedCells(grid, selectedCell, isHorizontal) {
   const orderedHighlightedCells = [];
   if (!selectedCell) return;
