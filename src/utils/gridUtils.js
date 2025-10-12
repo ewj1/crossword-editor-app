@@ -49,7 +49,7 @@ export function createClues(size) {
 }
 
 export function makeClueKey(row, col, isHorizontal) {
-  return `${row}-${col}-${isHorizontal ? "across" : "down"}`;
+  return `${row}-${col}-${isHorizontal ? "a" : "d"}`;
 }
 
 export function findOrderedHighlightedCells(grid, selectedCell, isHorizontal) {

@@ -22,16 +22,17 @@ export function EditorPage() {
   const gridRef = useRef(null);
   const { user } = useAuth();
   const { puzzleId } = useParams();
-  const savedGrid = sessionStorage.getItem("grid");
-  const initialState = savedGrid
-    ? { ...JSON.parse(savedGrid) }
-    : {
-        grid: createGrid(size),
-        gridActive: false,
-        selectedCell: null,
-        isHorizontal: true,
-        clues: createClues(size),
-      };
+  // const savedGrid = sessionStorage.getItem("grid");
+  //  savedGrid
+  //   ? { ...JSON.parse(savedGrid) }
+  //   :
+  const initialState = {
+    grid: createGrid(size),
+    gridActive: false,
+    selectedCell: null,
+    isHorizontal: true,
+    clues: createClues(size),
+  };
 
   const [gridState, dispatch] = useImmerReducer(gridReducer, initialState);
 
@@ -40,9 +41,8 @@ export function EditorPage() {
     async function load() {
       if (puzzleId) {
         const { data } = await apiFetch(`/puzzles/${puzzleId}`);
-        dispatch({ type: "setGrid", value: data.grid });
-      } else {
-        dispatch({ type: "setGrid", value: createGrid(size) });
+        console.log(data, "EDITOPAGE.JSX DATA");
+        dispatch({ type: "loadGrid", value: data });
       }
       setLoading(false);
     }

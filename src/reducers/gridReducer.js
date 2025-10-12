@@ -5,8 +5,9 @@ export function gridReducer(draft, action) {
   const row = draft.selectedCell?.row;
   const col = draft.selectedCell?.col;
   switch (action.type) {
-    case "setGrid":
-      draft.grid = action.value;
+    case "loadGrid":
+      draft.grid = action.value.grid;
+      draft.clues = action.value.clues;
       break;
     case "deleted":
       if (row === undefined || col === undefined) break;

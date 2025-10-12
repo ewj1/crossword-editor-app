@@ -125,7 +125,7 @@ export function Grid({ state, dispatch }) {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [state.gridActive, state.isHorizontal, dispatch]);
-
+  console.log(state, "GRID.JSX STATE");
   return (
     <>
       <div className="flex gap-4">
