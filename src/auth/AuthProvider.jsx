@@ -16,7 +16,7 @@ export function AuthProvider({ children }) {
   }, []);
 
   function login(grid) {
-    sessionStorage.setItem("grid", JSON.stringify(grid));
+    console.log(grid);
     window.location.href = "http://localhost:3000/auth/google";
   }
 

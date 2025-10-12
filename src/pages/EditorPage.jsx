@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useImmerReducer } from "use-immer";
 import { useAuth } from "../auth/useAuth";
 
@@ -22,10 +22,8 @@ export function EditorPage() {
   const gridRef = useRef(null);
   const { user } = useAuth();
   const { puzzleId } = useParams();
-  // const savedGrid = sessionStorage.getItem("grid");
-  //  savedGrid
-  //   ? { ...JSON.parse(savedGrid) }
-  //   :
+  const navigate = useNavigate();
+
   const initialState = {
     grid: createGrid(size),
     gridActive: false,
@@ -37,17 +35,33 @@ export function EditorPage() {
   const [gridState, dispatch] = useImmerReducer(gridReducer, initialState);
 
   useEffect(() => {
-    console.log("puzzleId", puzzleId);
+    const controller = new AbortController();
+    const signal = controller.signal;
     async function load() {
-      if (puzzleId) {
-        const { data } = await apiFetch(`/puzzles/${puzzleId}`);
-        console.log(data, "EDITOPAGE.JSX DATA");
-        dispatch({ type: "loadGrid", value: data });
+      if (!puzzleId) {
+        setLoading(false);
+        return;
       }
-      setLoading(false);
+      try {
+        const { data } = await apiFetch(`/puzzles/${puzzleId}`, { signal });
+        console.log(data, "EDITORPAGE.JSX DATA");
+        dispatch({ type: "loadGrid", value: data });
+        setTitle(data.title);
+        setLoading(false);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          console.log("Fetch aborted");
+        } else {
+          alert(err);
+          navigate("/");
+        }
+      }
     }
     load();
-  }, [puzzleId, dispatch]);
+    return () => {
+      controller.abort();
+    };
+  }, [puzzleId, dispatch, navigate]);
 
   useEffect(() => {
     setAuthor(user?.name || "Anonymous");
@@ -62,14 +76,14 @@ export function EditorPage() {
           method: isUpdate ? "PUT" : "POST",
           body: JSON.stringify({
             grid: gridState.grid,
-            title: gridState.title,
+            title: title,
             clues: gridState.clues,
           }),
         },
       );
       if (!isUpdate) {
         const newUrl = `/puzzles/${data}`;
-        window.history.pushState({}, "", newUrl);
+        navigate(newUrl);
       }
     } catch (err) {
       if (err.status === 401) {
