@@ -8,8 +8,10 @@ exports.up = function (knex) {
       .inTable("users")
       .onDelete("CASCADE");
     table.string("title");
-    table.json("data");
+    table.json("grid");
+    table.json("clues");
     table.timestamp("created_at").defaultTo(knex.fn.now());
+    table.timestamp("last_modified").defaultTo(knex.fn.now());
   });
 };
 

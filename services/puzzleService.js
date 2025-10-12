@@ -6,7 +6,8 @@ export async function createPuzzle(userId, data) {
     const [insertId] = await db("puzzles").insert({
       user_id: userId,
       title: data.title,
-      grid: JSON.stringify(data),
+      grid: JSON.stringify(data.grid),
+      clues: JSON.stringify(data.clues),
     });
     return insertId;
   });
@@ -21,6 +22,7 @@ export async function updatePuzzle(userId, puzzleId, data) {
       .update({
         title: data.title,
         grid: JSON.stringify(data.grid),
+        clues: JSON.stringify(data.clues),
         last_modified: db.fn.now(),
       });
   });
