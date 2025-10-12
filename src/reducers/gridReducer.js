@@ -1,14 +1,15 @@
 import { calcNextCell, findOrderedHighlightedCells } from "../utils/gridUtils";
 
 export function gridReducer(draft, action) {
-  if (!draft.selectedCell && action.type !== "selectedCell") {
-    return;
-  }
-  const size = draft.grid.length;
+  const size = draft.grid?.length;
   const row = draft.selectedCell?.row;
   const col = draft.selectedCell?.col;
   switch (action.type) {
+    case "setGrid":
+      draft.grid = action.value;
+      break;
     case "deleted":
+      if (row === undefined || col === undefined) break;
       if (draft.grid[row][col] === ".") {
         draft.grid[size - 1 - row][size - 1 - col] = "";
       }
@@ -23,6 +24,7 @@ export function gridReducer(draft, action) {
       break;
 
     case "insertedLetter":
+      if (row === undefined || col === undefined) return;
       draft.grid[row][col] = action.value;
       draft.selectedCell = calcNextCell(
         draft.selectedCell,
@@ -57,6 +59,7 @@ export function gridReducer(draft, action) {
       break;
 
     case "insertedBox":
+      if (row === undefined || col === undefined) return;
       draft.grid[row][col] = ".";
       draft.grid[size - 1 - row][size - 1 - col] = ".";
       draft.selectedCell = calcNextCell(
