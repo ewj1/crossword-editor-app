@@ -1,4 +1,4 @@
-import { findUserByGoogleId, createUser } from "../models/userModel.js";
+import { findUserByGoogleId, createUser } from "../services/userService.js";
 import { db } from "../config/db.js";
 
 export async function findOrCreateUser(googleProfile) {

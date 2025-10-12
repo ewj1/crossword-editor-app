@@ -1,13 +1,19 @@
 import express from "express";
-import { savePuzzle, getPuzzles } from "../controllers/puzzleController.js";
+import { ensureAuth } from "../middleware/ensureAuth.js";
+import {
+  createPuzzle,
+  updatePuzzle,
+  getPuzzleById,
+  getPuzzlesByUser,
+} from "../controllers/puzzleController.js";
 
 const router = express.Router();
-function ensureAuth(req, res, next) {
-  if (req.isAuthenticated()) return next();
-  res.status(401).json({ message: "Unauthorized" });
-}
 
-router.post("/save", ensureAuth, savePuzzle);
-router.get("/", ensureAuth, getPuzzles);
+router.get("/", ensureAuth, getPuzzlesByUser);
+router.post("/", ensureAuth, createPuzzle);
+
+router.get("/:id", ensureAuth, getPuzzleById);
+router.put("/:id", ensureAuth, updatePuzzle);
+// router.delete("/:id", ensureAuth, deletePuzzle);
 
 export default router;

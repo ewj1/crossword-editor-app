@@ -11,7 +11,6 @@ export async function findUserByGoogleId(googleId) {
 }
 
 export async function createUser(profile) {
-  console.log("CREATED USER!!!!");
   const { id: googleId, displayName, emails, photos } = profile;
   await db("users").insert({
     google_id: googleId,

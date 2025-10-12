@@ -34,7 +34,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use("/auth", authRoutes);
-app.use("/api/puzzles", puzzleRoutes);
+app.use("/puzzles", puzzleRoutes);
 
 app.listen(process.env.PORT || 3000, () => {
   console.log(`Server running on port ${process.env.PORT}`);
