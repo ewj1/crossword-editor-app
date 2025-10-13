@@ -12,8 +12,6 @@ import { Grid } from "../components/Grid";
 import { UserTab } from "../components/UserTab";
 import { Title } from "../components/Title";
 import { Toolbar } from "../components/Toolbar";
-import { DropdownItem } from "../components/DropdownItem";
-import { UserDropdown } from "../components/UserDropdown";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
