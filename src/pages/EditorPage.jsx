@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useImmerReducer } from "use-immer";
 import { useAuth } from "../auth/useAuth";
 
+import { toast } from "react-toastify";
 import { apiFetch } from "../api/apiFetch";
 import { gridReducer } from "../reducers/gridReducer";
 import { createGrid, createClues } from "../utils/gridUtils";
@@ -11,6 +12,8 @@ import { Grid } from "../components/Grid";
 import { UserTab } from "../components/UserTab";
 import { Title } from "../components/Title";
 import { Toolbar } from "../components/Toolbar";
+import { DropdownItem } from "../components/DropdownItem";
+import UserDropdown from "../components/UserDropdown";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -87,11 +90,11 @@ export function EditorPage() {
       }
     } catch (err) {
       if (err.status === 401) {
-        alert("Please log in before saving.");
+        toast.warn("Please log in before saving.");
       } else if (err.status >= 500) {
-        alert("Server error. Please try again.");
+        toast.error("Server error. Please try again.");
       } else {
-        alert(err.message);
+        toast.error(err.message);
       }
     }
   }
@@ -109,7 +112,7 @@ export function EditorPage() {
   if (loading) return <p>loading</p>;
   return (
     <>
-      <div className="m-4 flex justify-start gap-4">
+      <div className="m-4 flex items-start gap-4">
         <Toolbar onSave={handleSave} onExport={handleExport} />
         <div>
           <Title
@@ -123,6 +126,7 @@ export function EditorPage() {
       </div>
       <div className="absolute top-4 right-4 flex flex-col items-end space-y-2 select-none">
         <UserTab gridState={gridState} />
+        <UserDropdown />
       </div>
     </>
   );
