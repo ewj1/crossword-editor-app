@@ -13,7 +13,7 @@ import { UserTab } from "../components/UserTab";
 import { Title } from "../components/Title";
 import { Toolbar } from "../components/Toolbar";
 import { DropdownItem } from "../components/DropdownItem";
-import UserDropdown from "../components/UserDropdown";
+import { UserDropdown } from "../components/UserDropdown";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -125,8 +125,7 @@ export function EditorPage() {
         </div>
       </div>
       <div className="absolute top-4 right-4 flex flex-col items-end space-y-2 select-none">
-        <UserTab gridState={gridState} />
-        <UserDropdown />
+        <UserTab />
       </div>
     </>
   );
