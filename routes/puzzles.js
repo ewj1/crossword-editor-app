@@ -4,12 +4,12 @@ import {
   createPuzzle,
   updatePuzzle,
   getPuzzleById,
-  getPuzzlesByUser,
+  getPuzzlesInfoByUser,
 } from "../controllers/puzzleController.js";
 
 const router = express.Router();
 
-router.get("/", ensureAuth, getPuzzlesByUser);
+router.get("/", ensureAuth, getPuzzlesInfoByUser);
 router.post("/", ensureAuth, createPuzzle);
 
 router.get("/:id", ensureAuth, getPuzzleById);

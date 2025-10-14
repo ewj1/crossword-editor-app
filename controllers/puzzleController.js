@@ -15,8 +15,8 @@ export async function updatePuzzle(req, res) {
   handleController(res, result, 204);
 }
 
-export async function getPuzzlesByUser(req, res) {
-  const result = await puzzleService.getPuzzlesByUser(req.user.id);
+export async function getPuzzlesInfoByUser(req, res) {
+  const result = await puzzleService.getPuzzlesInfoByUser(req.user.id);
   handleController(res, result);
 }
 

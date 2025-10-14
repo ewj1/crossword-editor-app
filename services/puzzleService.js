@@ -14,7 +14,6 @@ export async function createPuzzle(userId, data) {
 }
 
 export async function updatePuzzle(userId, puzzleId, data) {
-  console.log("updatePuzzle data", data);
   return handleService(async () => {
     await verifyPuzzleOwnership(userId, puzzleId);
     await db("puzzles")
@@ -28,9 +27,11 @@ export async function updatePuzzle(userId, puzzleId, data) {
   });
 }
 
-export async function getPuzzlesByUser(userId) {
+export async function getPuzzlesInfoByUser(userId) {
   return handleService(async () => {
-    const rows = await db("puzzles").where("user_id", userId);
+    const rows = await db("puzzles")
+      .where("user_id", userId)
+      .select("id", "title", "created_at", "last_modified");
     return rows;
   });
 }
