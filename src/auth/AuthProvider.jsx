@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
-import { apiFetchUser } from "../api/apiFetchUser";
-import { apiLogout } from "../api/apiLogout";
+import { apiFetchUser } from "@/api/apiFetchUser";
+import { apiLogout } from "@/api/apiLogout";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -21,7 +21,6 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    sessionStorage.removeItem("grid");
     await apiLogout();
     setUser(null);
   }

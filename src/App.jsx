@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Toaster } from "sonner";
 import { EditorPage } from "./pages/EditorPage";
+import { MyPuzzlesPage } from "./pages/MyPuzzlesPage";
 
 export function App() {
   return (
@@ -9,8 +9,19 @@ export function App() {
       <Routes>
         <Route path="/" element={<EditorPage />} />
         <Route path="/puzzles/:puzzleId" element={<EditorPage />} />
+        <Route path="/my-puzzles" element={<MyPuzzlesPage />} />
       </Routes>
-      <ToastContainer position="top-center" hideProgressBar={true} />
+      <Toaster
+        position="bottom-right"
+        richColors
+        toastOptions={{
+          classNames: {
+            toast: "rounded-2xl shadow-lg font-medium",
+            title: "text-base",
+            description: "text-sm text-gray-400",
+          },
+        }}
+      />
     </>
   );
 }

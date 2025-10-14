@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useImmerReducer } from "use-immer";
 import { useAuth } from "../auth/useAuth";
 
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { apiFetch } from "../api/apiFetch";
 import { gridReducer } from "../reducers/gridReducer";
 import { createGrid, createClues } from "../utils/gridUtils";
@@ -12,6 +12,7 @@ import { Grid } from "../components/Grid";
 import { UserTab } from "../components/UserTab";
 import { Title } from "../components/Title";
 import { Toolbar } from "../components/Toolbar";
+import LoadingScreen from "@/components/LoadingScreen";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,6 +20,7 @@ export function EditorPage() {
   const [title, setTitle] = useState("Untitled");
   const [author, setAuthor] = useState("Anonymous");
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const size = 15;
   const gridRef = useRef(null);
   const { user } = useAuth();
@@ -69,6 +71,8 @@ export function EditorPage() {
   }, [user]);
 
   async function handleSave() {
+    const toastId = toast.loading("Saving your crossword... 🧩");
+    setSaving(true);
     try {
       const isUpdate = puzzleId != null;
       const { data } = await apiFetch(
@@ -82,18 +86,33 @@ export function EditorPage() {
           }),
         },
       );
+      toast.success("Crossword saved successfully! 💾", {
+        id: toastId,
+        description: "You can now view or share it from your dashboard.",
+        action: {
+          label: "View",
+          onClick: () => navigate`/puzzles/${data}`,
+        },
+      });
       if (!isUpdate) {
-        const newUrl = `/puzzles/${data}`;
-        navigate(newUrl);
+        navigate(`/puzzles/${data}`);
       }
     } catch (err) {
       if (err.status === 401) {
-        toast.warn("Please log in before saving.");
+        toast.error("Failed to save crossword.", {
+          id: toastId,
+          description: "Please log in before saving.",
+        });
       } else if (err.status >= 500) {
-        toast.error("Server error. Please try again.");
+        toast.error("Failed to save crossword.", {
+          id: toastId,
+          description: "Please try again in a moment.",
+        });
       } else {
         toast.error(err.message);
       }
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -107,11 +126,11 @@ export function EditorPage() {
       credentials: "include",
     });
   }
-  if (loading) return <p>loading</p>;
+  if (loading) return <LoadingScreen />;
   return (
     <>
       <div className="m-4 flex items-start gap-4">
-        <Toolbar onSave={handleSave} onExport={handleExport} />
+        <Toolbar onSave={handleSave} onExport={handleExport} saving={saving} />
         <div>
           <Title
             title={title}
