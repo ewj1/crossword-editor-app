@@ -77,33 +77,33 @@ export function findOrderedHighlightedCells(grid, selectedCell, isHorizontal) {
   return orderedHighlightedCells;
 }
 
-export function calculateNumberMap(grid, size) {
-  const numberMap = new Map();
+export function calculateNumMap(grid) {
+  const coordsToNum = new Map();
   let currentNum = 0;
-
   for (let r = 0; r < grid.length; r++) {
     for (let c = 0; c < grid.length; c++) {
       const cell = grid[r][c];
       if (cell === ".") {
-        numberMap.set(`${r}-${c}`, 0);
+        coordsToNum.set(`${r}-${c}`, 0);
         continue;
       }
       const isStartAcross =
         (c === 0 || grid[r][c - 1] === ".") &&
-        c + 1 < size &&
+        c + 1 < grid.length &&
         grid[r][c + 1] !== ".";
 
       const isStartDown =
         (r === 0 || grid[r - 1][c] === ".") &&
-        r + 1 < size &&
+        r + 1 < grid.length &&
         grid[r + 1][c] !== ".";
 
       if (isStartAcross || isStartDown) {
-        numberMap.set(`${r}-${c}`, ++currentNum);
+        currentNum++;
+        coordsToNum.set(`${r}-${c}`, currentNum);
       } else {
-        numberMap.set(`${r}-${c}`, 0);
+        coordsToNum.set(`${r}-${c}`, 0);
       }
     }
   }
-  return numberMap;
+  return coordsToNum;
 }

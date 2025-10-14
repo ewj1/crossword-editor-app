@@ -15,8 +15,7 @@ export function AuthProvider({ children }) {
     })();
   }, []);
 
-  function login(grid) {
-    console.log(grid);
+  function login() {
     window.location.href = "http://localhost:3000/auth/google";
   }
 

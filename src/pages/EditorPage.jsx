@@ -1,17 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useImmerReducer } from "use-immer";
-import { useAuth } from "../auth/useAuth";
+import { useAuth } from "@/auth/useAuth";
 
 import { toast } from "sonner";
-import { apiFetch } from "../api/apiFetch";
-import { gridReducer } from "../reducers/gridReducer";
-import { createGrid, createClues } from "../utils/gridUtils";
+import { apiFetch } from "@/api/apiFetch";
+import { gridReducer } from "@/reducers/gridReducer";
+import { createGrid, createClues } from "@/utils/gridUtils";
+import { generatePDF } from "@/utils/generatePDF";
 
-import { Grid } from "../components/Grid";
-import { UserTab } from "../components/UserTab";
-import { Title } from "../components/Title";
-import { Toolbar } from "../components/Toolbar";
+import { Grid } from "@/components/Grid";
+import { UserTab } from "@/components/UserTab";
+import { Title } from "@/components/Title";
+import { Toolbar } from "@/components/Toolbar";
 import { LoadingScreen } from "@/components/LoadingScreen";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -22,7 +23,6 @@ export function EditorPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const size = 15;
-  const gridRef = useRef(null);
   const { user } = useAuth();
   const { puzzleId } = useParams();
   const navigate = useNavigate();
@@ -114,15 +114,9 @@ export function EditorPage() {
   }
 
   async function handleExport() {
-    await apiFetch("/puzzles/export", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(gridRef.current.getSaveData()),
-      credentials: "include",
-    });
+    generatePDF(gridState.grid, gridState.clues);
   }
+
   if (loading) return <LoadingScreen />;
   return (
     <>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useMemo } from "react";
 import {
   findOrderedHighlightedCells,
-  calculateNumberMap,
+  calculateNumMap,
   makeClueKey,
 } from "../utils/gridUtils";
 
@@ -28,10 +28,7 @@ export function Grid({ state, dispatch }) {
     [state.grid, state.selectedCell, state.isHorizontal],
   );
 
-  const numberMap = useMemo(
-    () => calculateNumberMap(state.grid, size),
-    [state.grid, size],
-  );
+  const coordsToNum = useMemo(() => calculateNumMap(state.grid), [state.grid]);
 
   const highlightedCellsSet = useMemo(
     () => new Set(highlightedCells),
@@ -46,11 +43,6 @@ export function Grid({ state, dispatch }) {
       key: makeClueKey(row, col, isHorizontal),
       value: text,
     });
-  }
-
-  function getClue(row, col, isHorizontal) {
-    const key = makeClueKey(row, col, isHorizontal);
-    return state.clues[key];
   }
 
   //EFFECTS
@@ -141,7 +133,7 @@ export function Grid({ state, dispatch }) {
                 key={`${r}-${c}`}
                 cellSizeRem={CELL_SIZE_REM}
                 value={cell}
-                number={numberMap.get(`${r}-${c}`)}
+                number={coordsToNum.get(`${r}-${c}`)}
                 isReciprocal={
                   size - 1 - state.selectedCell?.row === r &&
                   size - 1 - state.selectedCell?.col === c
@@ -174,12 +166,17 @@ export function Grid({ state, dispatch }) {
         <div className="flex flex-col">
           <EntryLabel
             selectedIndex={
-              highlightedCells && numberMap.get(highlightedCells[0])
+              highlightedCells && coordsToNum.get(highlightedCells[0])
             }
             isHorizontal={state.isHorizontal}
             clue={
               highlightedCells &&
-              getClue(...highlightedCells[0].split("-"), state.isHorizontal)
+              state.clues[
+                makeClueKey(
+                  ...highlightedCells[0].split("-"),
+                  state.isHorizontal,
+                )
+              ]
             }
             updateClue={(text) =>
               updateClue(
