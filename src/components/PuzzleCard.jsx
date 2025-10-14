@@ -5,7 +5,6 @@ export function PuzzleCard({ puzzle, isAddCard }) {
     <>
       <div
         onClick={() => {
-          console.log("clicked!");
           navigate(isAddCard ? "/" : `/puzzles/${puzzle.id}`);
         }}
         className="cursor-pointer rounded-2xl border border-gray-200 bg-white p-4 transition-transform duration-200 hover:scale-[1.02] hover:shadow-lg"
