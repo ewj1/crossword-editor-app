@@ -12,7 +12,7 @@ import { Grid } from "../components/Grid";
 import { UserTab } from "../components/UserTab";
 import { Title } from "../components/Title";
 import { Toolbar } from "../components/Toolbar";
-import LoadingScreen from "@/components/LoadingScreen";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -47,14 +47,11 @@ export function EditorPage() {
       }
       try {
         const { data } = await apiFetch(`/puzzles/${puzzleId}`, { signal });
-        console.log(data, "EDITORPAGE.JSX DATA");
         dispatch({ type: "loadGrid", value: data });
         setTitle(data.title);
         setLoading(false);
       } catch (err) {
-        if (err.name === "AbortError") {
-          console.log("Fetch aborted");
-        } else {
+        if (err.name !== "AbortError") {
           alert(err);
           navigate("/");
         }
