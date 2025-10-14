@@ -8,7 +8,7 @@ export function EntryLabel({ selectedIndex, isHorizontal, clue, updateClue }) {
           ? `${selectedIndex} ${isHorizontal ? "ACROSS" : "DOWN"}`
           : "NONE SELECTED"}
       </span>
-      {selectedIndex && (
+      {selectedIndex !== 0 && (
         <EditableSpan
           value={clue}
           setValue={updateClue}
