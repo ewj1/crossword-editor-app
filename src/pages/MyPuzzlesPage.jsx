@@ -4,7 +4,6 @@ import { GoogleLoginButton } from "../components/GoogleLoginButton";
 
 export function MyPuzzlesPage() {
   const { user, login } = useAuth();
-  console.log("my puzzles page!!");
   if (!user) {
     return (
       <div className="flex h-[80vh] flex-col items-center justify-center space-y-4 text-center">
