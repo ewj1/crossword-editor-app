@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 64 64"
+     width="64" height="64"
+     role="img" aria-label="Return home"
+     preserveAspectRatio="xMidYMid meet">
+  <title>Home — Crossword Logo</title>
+
+  <!-- Background rounded square -->
+  <rect x="0" y="0" width="64" height="64" rx="2" ry="2" fill="#000000ff" />
+        <!-- stroke="#111827" stroke-width="1" -->
+
+  <!-- Grid parameters -->
+  <!-- 5x5 grid centered. cell size = 10, gap = 2 -->
+  <g id="grid" transform="translate(3,3)">
+    <!-- Draw cells -->
+    <!-- Loop manually: rows 0..4, cols 0..4 -->
+    <!-- We'll make a few black blocks to feel crossword-like -->
+    <!-- Use CSS variables for easy recolor -->
+    <defs>
+      <style>
+        .cell { fill: #ffffff; }
+        .block { fill: #111827; }
+        .accent { fill: oklch(0.75 0.183 55.934); } 
+        <!-- /* hover when inline SVG inside a link */
+        svg:hover .accent { transform-origin: center; transform-box: fill-box; transform: scale(1.06); } -->
+        <!-- svg:hover .cell { filter: drop-shadow(0 1px 1px rgba(0,0,0,0.08)); } -->
+      </style>
+    </defs>
+    
+    <!-- Row 0 -->
+    <!-- <rect class="cell" x="0"  y="0"  width="10" height="10" />
+    <rect class="block" x="12" y="0"  width="10" height="10" /> -->
+    <rect class="cell" x="24" y="0"  width="10" height="10" />
+    <rect class="cell" x="36" y="0"  width="10" height="10" />
+    <rect class="cell" x="48" y="0"  width="10" height="10" />
+
+    <!-- Row 1 -->
+    <!-- <rect class="block" x="0"  y="12" width="10" height="10" /> -->
+    <rect class="cell" x="12" y="12" width="10" height="10" />
+    <rect class="cell" x="24" y="12" width="10" height="10" />
+    <rect class="cell" x="36" y="12" width="10" height="10" />
+    <rect class="cell" x="48" y="12" width="10" height="10" />
+
+    <!-- Row 2 -->
+    <rect class="cell" x="0"  y="24" width="10" height="10" />
+    <rect class="cell" x="12" y="24" width="10" height="10" />
+    <!-- center cell (home) -->
+    <rect class="accent" x="24" y="24" width="10" height="10" />
+    <rect class="cell" x="36" y="24" width="10" height="10" />
+    <rect class="cell" x="48" y="24" width="10" height="10" />
+
+    <!-- Row 3 -->
+    <rect class="cell" x="0"  y="36" width="10" height="10" />
+    <rect class="cell" x="12" y="36" width="10" height="10" />
+    <rect class="cell" x="24" y="36" width="10" height="10" />
+    <rect class="cell" x="36" y="36" width="10" height="10" />
+    <!-- <rect class="block" x="48" y="36" width="10" height="10" /> -->
+
+    <!-- Row 4 -->
+    <rect class="cell" x="0"  y="48" width="10" height="10" />
+    <rect class="cell" x="12" y="48" width="10" height="10" />
+    <rect class="cell" x="24" y="48" width="10" height="10" />
+    <!-- <rect class="block" x="36" y="48" width="10" height="10" />
+    <rect class="block" x="48" y="48" width="10" height="10" /> -->
+
+  </g>
+</svg>
+
