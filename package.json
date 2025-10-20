@@ -1,0 +1,10 @@
+{
+  "name": "crossword-app",
+  "private": true,
+  "scripts": {
+    "build:frontend": "npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend run build || true",
+    "start": "node backend/server.js",
+    "dev": "npm --prefix frontend run dev & npm --prefix backend run dev"
+  }
+}
