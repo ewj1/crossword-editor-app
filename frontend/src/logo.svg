@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 64 64"
+     width="64" height="64"
+     role="img" aria-label="Return home"
+     preserveAspectRatio="xMidYMid meet">
+  <title>Home — Crossword Logo</title>
+
+  <!-- Background rounded square -->
+  <!-- <rect x="0.5" y="0.5" width="63" height="63" rx="2" ry="2" fill="#000000ff" /> -->
+
+    <!-- Draw cells -->
+    <!-- Loop manually: rows 0..4, cols 0..4 -->
+    <!-- We'll make a few black blocks to feel crossword-like -->
+    <!-- Use CSS variables for easy recolor -->
+  <defs>
+    <style>
+      .cell { fill: #ffffff; }
+      .block { fill: #111827; }
+      .accent { fill: oklch(0.75 0.183 55.934); } 
+    </style>
+  </defs>
+
+  
+</svg>
+
