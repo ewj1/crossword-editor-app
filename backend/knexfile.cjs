@@ -1,4 +1,12 @@
-require("dotenv").config();
+const dotenv = require("dotenv");
+const path = require("path");
+
+const envFile =
+  process.env.NODE_ENV === "production"
+    ? path.resolve("./backend/.env.production")
+    : path.resolve("./backend/.env");
+
+dotenv.config({ path: envFile, override: true });
 
 module.exports = {
   development: {

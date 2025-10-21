@@ -1,14 +1,22 @@
+import path from "path";
+import dotenv from "dotenv";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { findOrCreateUser } from "../controllers/authController.js";
-import { findUserById } from "../services/userService.js";
+
+const envFile =
+  process.env.NODE_ENV === "production"
+    ? path.resolve("./.env.production")
+    : path.resolve("./.env");
+
+dotenv.config({ path: envFile, override: true });
 
 passport.use(
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: "http://localhost:3000/auth/google/callback",
+      callbackURL: process.env.GOOGLE_CALLBACK,
       scope: ["profile", "email"],
     },
     async (accessToken, refreshToken, googleProfile, done) => {
@@ -21,13 +29,3 @@ passport.use(
     }
   )
 );
-
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await findUserById(id);
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
-});
