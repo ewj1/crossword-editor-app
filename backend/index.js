@@ -2,22 +2,35 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
-import session from "express-session";
 import dotenv from "dotenv";
 import passport from "passport";
 import helmet from "helmet";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 import "./config/db.js";
 import "./config/passport.js";
 import authRoutes from "./routes/auth.js";
 import puzzleRoutes from "./routes/puzzles.js";
 
-dotenv.config();
+const envFile =
+  process.env.NODE_ENV === "production"
+    ? path.resolve("./.env.production")
+    : path.resolve("./.env");
+
+dotenv.config({ path: envFile, override: true });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      connectSrc: ["'self'", "https://api.datamuse.com"],
+      imgSrc: ["'self'", "data:", "https://lh3.googleusercontent.com"],
+    },
+  })
+);
 app.use(express.json());
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(
@@ -26,21 +39,9 @@ app.use(
     credentials: true,
   })
 );
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-    },
-  })
-);
-app.use(passport.initialize());
-app.use(passport.session());
 
+app.use(passport.initialize());
+app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/puzzles", puzzleRoutes);
 
@@ -52,7 +53,7 @@ app.use(
   })
 );
 
-app.get("*", (req, res) => {
+app.get(/.*/, (req, res) => {
   if (req.path.startsWith("/api"))
     return res.status(404).json({ error: "Not found" });
   res.sendFile(path.join(staticPath, "index.html"));

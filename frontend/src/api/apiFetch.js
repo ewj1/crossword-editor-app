@@ -1,7 +1,7 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 export async function apiFetch(endpoint, options = {}) {
-  const res = await fetch(`${API_URL}/api${endpoint}`, {
+  const res = await fetch(`${BACKEND_URL}/api${endpoint}`, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",

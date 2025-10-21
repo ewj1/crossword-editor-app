@@ -1,5 +1,5 @@
 import express from "express";
-import { ensureAuth } from "../middleware/ensureAuth.js";
+import { authenticateJWT } from "../middleware/authenticateJWT.js";
 import {
   createPuzzle,
   updatePuzzle,
@@ -9,11 +9,11 @@ import {
 
 const router = express.Router();
 
-router.get("/", ensureAuth, getPuzzlesInfoByUser);
-router.post("/", ensureAuth, createPuzzle);
+router.get("/", authenticateJWT, getPuzzlesInfoByUser);
+router.post("/", authenticateJWT, createPuzzle);
 
-router.get("/:id", ensureAuth, getPuzzleById);
-router.put("/:id", ensureAuth, updatePuzzle);
-// router.delete("/:id", ensureAuth, deletePuzzle);
+router.get("/:id", authenticateJWT, getPuzzleById);
+router.put("/:id", authenticateJWT, updatePuzzle);
+// router.delete("/:id", authenticateJWT, deletePuzzle);
 
 export default router;

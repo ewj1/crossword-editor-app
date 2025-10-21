@@ -2,9 +2,12 @@
   "name": "crossword-app",
   "private": true,
   "scripts": {
-    "build:frontend": "npm --prefix frontend run build",
-    "build:backend": "npm --prefix backend run build || true",
-    "start": "node backend/server.js",
-    "dev": "npm --prefix frontend run dev & npm --prefix backend run dev"
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
+    "dev": "concurrently \"npm --prefix frontend run dev\" \"cd backend && npm run dev && cd ..\""
+  },
+  "dependencies": {
+    "concurrently": "^9.2.1",
+    "cookie-parser": "^1.4.7"
   }
 }
