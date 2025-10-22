@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "NODE_ENV=development npx nodemon index.js",
-    "start:test": "NODE_ENV=test node index.js",
-    "start": "NODE_ENV=production node index.js",
+    "start:test": "NODE_ENV=test npm run migrate && node index.js",
+    "start": "NODE_ENV=production npm run migrate && node index.js",
     "migrate": "knex migrate:latest --knexfile knexfile.cjs",
     "migrate:make": "knex migrate:make --knexfile knexfile.cjs",
     "migrate:rollback": "knex migrate:rollback --knexfile knexfile.cjs",
