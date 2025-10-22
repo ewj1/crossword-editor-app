@@ -45,7 +45,10 @@ router.get("/me", authenticateJWT, attachFullUser, (req, res) => {
     return res.json({ loggedIn: false });
   }
   const { name, google_avatar, email } = req.user;
-  res.json({ loggedIn: true, user: { name, google_avatar, email } });
+  res.status(200).json({
+    success: true,
+    data: { loggedIn: true, user: { name, google_avatar, email } },
+  });
 });
 
 export default router;
