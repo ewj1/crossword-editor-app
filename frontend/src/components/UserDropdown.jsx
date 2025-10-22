@@ -10,13 +10,7 @@ export function UserDropdown({ isOpen, logout }) {
           <DropdownItem onClick={() => navigate("/my-puzzles")}>
             My Puzzles
           </DropdownItem>
-          <DropdownItem>Settings</DropdownItem>
-          <button
-            className="mt-1 block w-full border-t border-gray-200 px-4 py-2 text-left hover:bg-gray-100"
-            onClick={logout}
-          >
-            Logout
-          </button>
+          <DropdownItem onClick={logout}>Logout</DropdownItem>
         </div>
       )}
     </>

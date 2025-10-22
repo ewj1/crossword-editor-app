@@ -33,7 +33,6 @@ export function UserTab() {
           src={user.google_avatar}
           alt={user.name}
           className="h-10 w-10 rounded-full"
-          referrerPolicy="no-referrer"
         />
       </button>
       <UserDropdown isOpen={isOpen} logout={logout} />
