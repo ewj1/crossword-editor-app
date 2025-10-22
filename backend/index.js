@@ -1,5 +1,4 @@
-import { loadEnv } from "./config/loadEnv.js";
-loadEnv();
+import "./config/loadEnv.js";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -52,4 +51,8 @@ app.get(/.*/, (req, res) => {
   if (req.path.startsWith("/api"))
     return res.status(404).json({ error: "Not found" });
   res.sendFile(path.join(staticPath, "index.html"));
+});
+
+app.listen(process.env.PORT, () => {
+  console.log(`Server running on port ${process.env.PORT}`);
 });
