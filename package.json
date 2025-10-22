@@ -2,7 +2,9 @@
   "name": "crossword-app",
   "private": true,
   "scripts": {
+    "build:test": "npm --prefix frontend run build:test",
     "build": "npm --prefix frontend run build",
+    "start:test": "npm --prefix backend start:test",
     "start": "npm --prefix backend start",
     "dev": "concurrently \"npm --prefix frontend run dev\" \"cd backend && npm run dev && cd ..\""
   },
