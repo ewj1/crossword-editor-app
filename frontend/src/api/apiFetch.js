@@ -9,7 +9,7 @@ export async function apiFetch(endpoint, options = {}) {
     },
     ...options,
   });
-  console.log("res: ", res);
+
   if (res.status === 204) {
     return { success: true, data: null };
   }
