@@ -9,20 +9,19 @@ export async function apiFetch(endpoint, options = {}) {
     },
     ...options,
   });
-  if (!res.ok) {
-    let message = `HTTP ${res.status}`;
-    try {
-      const errData = await res.json();
-      if (errData?.message) message = errData.message;
-    } catch {
-      //ignore json errors
-    }
-    const error = new Error(message);
-    error.status = res.status;
-    throw error;
-  }
+  console.log("res: ", res);
   if (res.status === 204) {
     return { success: true, data: null };
   }
-  return await res.json();
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    const error = new Error(data?.message || `HTTP ${res.status}`);
+    error.status = res.status;
+    error.data = data;
+    throw error;
+  }
+
+  return data;
 }

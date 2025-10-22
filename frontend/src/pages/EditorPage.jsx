@@ -72,7 +72,7 @@ export function EditorPage() {
     setSaving(true);
     try {
       const isUpdate = puzzleId != null;
-      const { data } = await apiFetch(
+      const data = await apiFetch(
         isUpdate ? `/puzzles/${puzzleId}` : "/puzzles/",
         {
           method: isUpdate ? "PUT" : "POST",
@@ -88,7 +88,7 @@ export function EditorPage() {
         description: "You can now view or share it from your dashboard.",
         action: {
           label: "View",
-          onClick: () => navigate`/puzzles/${data}`,
+          onClick: () => navigate(`/puzzles/${data}`),
         },
       });
       if (!isUpdate) {
