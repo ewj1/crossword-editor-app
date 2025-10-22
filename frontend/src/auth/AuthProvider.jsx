@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import { apiFetchUser } from "@/api/apiFetchUser";
 import { apiLogout } from "@/api/apiLogout";
@@ -6,6 +7,7 @@ import { apiLogout } from "@/api/apiLogout";
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -16,12 +18,13 @@ export function AuthProvider({ children }) {
   }, []);
 
   function login() {
-    window.location.href = "http://localhost:3000/auth/google";
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google`;
   }
 
   async function logout() {
     await apiLogout();
     setUser(null);
+    navigate("/");
   }
 
   return (
