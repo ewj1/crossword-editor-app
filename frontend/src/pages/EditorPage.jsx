@@ -95,7 +95,7 @@ export function EditorPage() {
         navigate(`/puzzles/${data}`);
       }
     } catch (err) {
-      if (err.status === 401) {
+      if (err.status === 401 || err.status === 403) {
         toast.error("Failed to save crossword.", {
           id: toastId,
           description: "Please log in before saving.",
@@ -113,8 +113,8 @@ export function EditorPage() {
     }
   }
 
-  async function handleExport() {
-    generatePDF(gridState.grid, gridState.clues);
+  async function handleExport(answerKey) {
+    generatePDF(gridState.grid, gridState.clues, title, answerKey);
   }
 
   if (loading) return <LoadingScreen />;
