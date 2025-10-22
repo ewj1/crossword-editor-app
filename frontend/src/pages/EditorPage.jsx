@@ -72,7 +72,7 @@ export function EditorPage() {
     setSaving(true);
     try {
       const isUpdate = puzzleId != null;
-      const data = await apiFetch(
+      const { data } = await apiFetch(
         isUpdate ? `/puzzles/${puzzleId}` : "/puzzles/",
         {
           method: isUpdate ? "PUT" : "POST",
