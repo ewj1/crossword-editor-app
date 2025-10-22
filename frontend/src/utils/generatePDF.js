@@ -1,31 +1,31 @@
 import { calculateNumMap, makeClueKey } from "./gridUtils";
 
-export async function generatePDF(grid, clues) {
-  //lazy-load
+export async function generatePDF(grid, clues, title, answerKey) {
   const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
     import("jspdf"),
     import("jspdf-autotable"),
   ]);
-  const clueList = { across: {}, down: {} };
+  const clueList = { across: new Map(), down: new Map() };
   const coordsToNum = calculateNumMap(grid);
   const doc = new jsPDF();
-  doc.setFillColor(0, 0, 0); // RGB black
-  // Draw crossword grid manually
+  doc.setFillColor(0, 0, 0);
   const cellSize = 10;
   grid.forEach((row, i) => {
     row.forEach((cell, j) => {
-      doc.setFontSize(12);
+      doc.setFontSize(14);
       const x = 10 + j * cellSize;
       const y = 10 + i * cellSize;
       doc.rect(x, y, cellSize, cellSize, cell === "." ? "F" : "S");
-      doc.text(cell, x + cellSize / 2, y + cellSize / 2, {
-        align: "center",
-        baseline: "middle",
-      });
+      if (answerKey) {
+        doc.text(cell, x + cellSize / 2, y + cellSize / 2, {
+          align: "center",
+          baseline: "middle",
+        });
+      }
       const num = coordsToNum.get(`${i}-${j}`);
       if (num) {
         doc.setFontSize(6);
-        doc.text(String(num), x + 1, y + 4);
+        doc.text(String(num), x + cellSize / 20, y + cellSize / 5);
 
         const isStartAcross =
           (j === 0 || grid[i][j - 1] === ".") &&
@@ -37,26 +37,35 @@ export async function generatePDF(grid, clues) {
           i + 1 < grid.length &&
           grid[i + 1][j] !== ".";
         if (isStartAcross) {
-          clueList.across.num = clues[makeClueKey(i, j, true)];
+          clueList.across.set(num, clues[makeClueKey(i, j, true)]);
         }
         if (isStartDown) {
-          clueList.down.num = clues[makeClueKey(i, j, false)];
+          clueList.down.set(num, clues[makeClueKey(i, j, false)]);
         }
       }
     });
   });
 
-  // Draw clues as a table using autoTable (optional)
-  console.log("clues", clues);
-  console.log("clueList", clueList);
-  // if (crosswordData.across.length > 0) {
-  //   autoTable(doc, {
-  //     startY: 10 + crosswordData.grid.length * 10 + 10,
-  //     head: [["Clues"]],
-  //     body: crosswordData.across.map((clue, idx) => [`${idx + 1}. ${clue}`]),
-  //     theme: "plain",
-  //   });
-  // }
+  const pageNumber = doc.internal.getNumberOfPages();
+  autoTable(doc, {
+    body: Array.from(clueList.across).map(([num, clue]) => [`${num}. ${clue}`]),
+    startY: grid.length * cellSize + 10,
+    head: [["Across"]],
+    showHead: "firstPage",
+    style: { overflow: "linebreak" },
+    margin: { right: 107 },
+    theme: "plain",
+  });
+  doc.setPage(pageNumber);
+  autoTable(doc, {
+    body: Array.from(clueList.down).map(([num, clue]) => [`${num}. ${clue}`]),
+    startY: grid.length * cellSize + 10,
+    head: [["Down"]],
+    showHead: "firstPage",
+    style: { overflow: "linebreak" },
+    margin: { left: 107 },
+    theme: "plain",
+  });
 
-  doc.save("crossword.pdf");
+  doc.save(`${title}.pdf`);
 }
