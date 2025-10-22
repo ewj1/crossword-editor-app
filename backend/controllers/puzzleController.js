@@ -1,9 +1,8 @@
 import * as puzzleService from "../services/puzzleService.js";
-import { handleController } from "../utils/handleController.js";
 
 export async function createPuzzle(req, res) {
-  const result = await puzzleService.createPuzzle(req.user.id, req.body);
-  handleController(res, result);
+  const puzzleId = await puzzleService.createPuzzle(req.user.id, req.body);
+  res.status(201).json({ success: true, data: puzzleId });
 }
 
 export async function updatePuzzle(req, res) {
@@ -12,15 +11,15 @@ export async function updatePuzzle(req, res) {
     req.params.id,
     req.body
   );
-  handleController(res, result, 204);
+  res.status(204).json({ success: true, data: null });
 }
 
 export async function getPuzzlesInfoByUser(req, res) {
-  const result = await puzzleService.getPuzzlesInfoByUser(req.user.id);
-  handleController(res, result);
+  const info = await puzzleService.getPuzzlesInfoByUser(req.user.id);
+  res.status(200).json({ success: true, data: info });
 }
 
 export async function getPuzzleById(req, res) {
-  const result = await puzzleService.getPuzzleById(req.user.id, req.params.id);
-  handleController(res, result);
+  const puzzle = await puzzleService.getPuzzleById(req.user.id, req.params.id);
+  res.status(200).json({ success: true, data: puzzle });
 }

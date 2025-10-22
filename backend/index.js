@@ -47,6 +47,18 @@ app.use(
   })
 );
 
+app.use((err, req, res, next) => {
+  const status = err.status || 500;
+  const message = err.message || "Internal server error";
+
+  console.error("Error:", err); // Log for debugging
+
+  res.status(status).json({
+    success: false,
+    error: { status, message },
+  });
+});
+
 app.get(/.*/, (req, res) => {
   if (req.path.startsWith("/api"))
     return res.status(404).json({ error: "Not found" });
