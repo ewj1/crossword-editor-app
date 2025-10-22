@@ -1,15 +1,6 @@
-import path from "path";
-import dotenv from "dotenv";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { findOrCreateUser } from "../controllers/authController.js";
-
-const envFile =
-  process.env.NODE_ENV === "production"
-    ? path.resolve("./.env.production")
-    : path.resolve("./.env");
-
-dotenv.config({ path: envFile, override: true });
 
 passport.use(
   new GoogleStrategy(

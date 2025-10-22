@@ -1,8 +1,9 @@
+import { loadEnv } from "./config/loadEnv.js";
+loadEnv();
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import cors from "cors";
-import dotenv from "dotenv";
 import passport from "passport";
 import helmet from "helmet";
 import morgan from "morgan";
@@ -12,12 +13,6 @@ import "./config/passport.js";
 import authRoutes from "./routes/auth.js";
 import puzzleRoutes from "./routes/puzzles.js";
 
-const envFile =
-  process.env.NODE_ENV === "production"
-    ? path.resolve("./.env.production")
-    : path.resolve("./.env");
-
-dotenv.config({ path: envFile, override: true });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
@@ -32,10 +27,10 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
+app.use(morgan(process.env.NODE_ENV === "development" ? "dev" : "combined"));
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );

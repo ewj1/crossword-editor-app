@@ -1,17 +1,8 @@
 import express from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
-import path from "path";
-import dotenv from "dotenv";
 import { authenticateJWT } from "../middleware/authenticateJWT.js";
 import { attachFullUser } from "../middleware/attachFullUser.js";
-
-const envFile =
-  process.env.NODE_ENV === "production"
-    ? path.resolve("./.env.production")
-    : path.resolve("./.env");
-
-dotenv.config({ path: envFile, override: true });
 
 const router = express.Router();
 
